@@ -13,7 +13,7 @@ class PlayerGraphics(object):
         self.screen = screen
         self.color = (255,255,255)
 
-    def update(self, Entity):  
+    def update(self, Entity):
         green = Entity.health
         if green < 0:
             green = 0
@@ -21,7 +21,6 @@ class PlayerGraphics(object):
         self.color = (150 - green, green, 0)
         pygame.draw.rect(self.screen, self.color, Entity.rect)
 
-        
 
 class BotGraphics(object):
     def __init__(self, screen):

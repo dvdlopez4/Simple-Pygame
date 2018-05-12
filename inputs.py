@@ -91,7 +91,7 @@ class InputComponent2(object):
         if key[pygame.K_LEFT]:
             Entity.velocity[0] = -150
         if key[pygame.K_RIGHT]:
-            Entity.velocity[0] = 150 
+            Entity.velocity[0] = 150
 
         if key[pygame.K_f] and not self.isRightPressed:
             self.isRightPressed = True

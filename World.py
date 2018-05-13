@@ -28,49 +28,26 @@ class World(object):
 
 
     def loadAssets(self):
-        World_Map = [
-        "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
-        "w                                                       ",
-        "w                                                       ",
-        "w   ww   ww   wwww                         w   wwwwwwwww",
-        "w                    w      wwwwwwww                   w",
-        "w                                                      w",
-        "w                                                      w",
-        "w                                                      w",
-        "w                                                      w",
-        "w                                                      w",
-        "w                         wwwwwwwwwww                  w",
-        "w                                                      w",
-        "w                                                      w",
-        "w                                       wwwwwwwwww     w",
-        "w              wwww                                    w",
-        "w                                                      w",
-        "w                                                      w",
-        "wwwwwwwwwwwwwwwww          wwwwwwwwwww                 w",
-        "           w                                           w",
-        "           w                                           w",
-        "           w                                       wwwww",
-        "           w                                       w   w",
-        "           w                                       w   w",
-        "           w                                wwwwwwwwwwww",
-        "           w                                w          w",
-        "           wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww"
-        ]
+
+        f = open("world.data", "r")
+        World_Map = f.readlines()
+        f.close()
         x = y = 0
         square = 20
+        rawImage = pygame.image.load('platform.png')
         for row in World_Map:
             for char in row:
                 if char == 'w':
-                    self.addEntity(Wall(None, None, GraphicsComponent(self.screen),x,y,square,square))
+                    self.addEntity(Wall(None, None, GraphicsComponent(self.screen, rawImage),x,y,square,square))
                 x += square
             y += square
             x = 0
 
         player = Player(InputComponent2(), PhysicsComponent(self), PlayerGraphics(self.screen))
         self.addEntity(player)
-        player2 = Player(InputComponent(), PhysicsComponent(self), GraphicsComponent(self.screen))
-        player2.collide = True
-        player2.rect.center = 100, 100
+
+        rawImage = pygame.image.load('forest.jpg')
+        self.image = pygame.transform.scale(rawImage, (1280, 720))
 
     def run(self):
         total = 0
@@ -88,7 +65,6 @@ class World(object):
             self.input()
             self.physics(time)
             self.render()
-
             pygame.display.update()
             clock.tick(60)
 
@@ -105,6 +81,7 @@ class World(object):
                     e.update(time)
             self.lag -= self.MS_PER_UPDATE
     def render(self):
+        self.screen.blit(self.image, (0,0))
         for e in self.entities:
             if e.graphics != None:
                 e.render()

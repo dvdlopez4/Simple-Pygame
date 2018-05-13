@@ -4,14 +4,8 @@ from World import *
 
 
 def main():
-    # world = World()
-    # world.run()
-
-    f = open("test.txt", "r")
-    contents = f.readlines()
-    print (len(contents))
-
-
+    world = World()
+    world.run()
 
 if __name__ == '__main__':
     main()

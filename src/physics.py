@@ -14,15 +14,6 @@ class PhysicsComponent(object):
 
     def update(self, Entity, time):
         time /= 1000
-        for obj in self.world.entities:
-            if obj.collide and obj.velocity[0] != 0:  
-                if (obj.rect.collidepoint(Entity.rect.centerx, Entity.rect.bottom + 1) or
-                    obj.rect.colliderect(Entity.rect)):
-                    Entity.velocity[0] += obj.velocity[0] / time
-                    if obj.velocity[1] < 0:
-                        Entity.rect.bottom = obj.rect.top
-
-                    
 
         if Entity.velocity[0] != 0:
             self.move_single_axis(Entity, Entity.velocity[0] * time, 0)
@@ -31,6 +22,11 @@ class PhysicsComponent(object):
 
         Entity.velocity[0] += self.acceleration[0] * time
         Entity.velocity[1] += self.acceleration[1] * time
+        if Entity.velocity[1] > 0: Entity.velocity[1] += self.acceleration[1] * time
+
+        if Entity.rect.centery > 1280: 
+            Entity.rect.center = 100, 200
+            Entity.velocity[1] = 0
 
         Entity.velocity[0] = 0
   

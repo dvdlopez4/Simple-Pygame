@@ -29,16 +29,16 @@ class World(object):
 
     def loadAssets(self):
 
-        f = open("world.data", "r")
+        f = open("../levels/world.data", "r")
         World_Map = f.readlines()
         f.close()
         x = y = 0
         square = 20
-        rawImage = pygame.image.load('platform.png')
+        rawImage = pygame.image.load('../assets/platform.png')
         for row in World_Map:
             for char in row:
                 if char == 'w':
-                    self.addEntity(Wall(None, None, GraphicsComponent(self.screen, rawImage),x,y,square,square))
+                    self.addEntity(Wall(None, None, GraphicsComponent(self.screen, rawImage),x,y,square + 15,square))
                 x += square
             y += square
             x = 0
@@ -46,7 +46,7 @@ class World(object):
         player = Player(InputComponent2(), PhysicsComponent(self), PlayerGraphics(self.screen))
         self.addEntity(player)
 
-        rawImage = pygame.image.load('forest.jpg')
+        rawImage = pygame.image.load('../assets/forest.jpg')
         self.image = pygame.transform.scale(rawImage, (1280, 720))
 
     def run(self):

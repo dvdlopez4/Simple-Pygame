@@ -43,7 +43,7 @@ class World(object):
             y += square
             x = 0
 
-        player = Player(InputComponent2(), PhysicsComponent(self), PlayerGraphics(self.screen))
+        player = Player(InputComponent(), PhysicsComponent(self), PlayerGraphics(self.screen))
         self.addEntity(player)
 
         rawImage = pygame.image.load('../assets/forest.jpg')

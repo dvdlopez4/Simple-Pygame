@@ -39,7 +39,7 @@ class InputComponent(object):
                 Entity.state = 1
             elif Entity.state == 1:
                 Entity.state = 2
-                Entity.velocity[1] = -225
+                Entity.velocity[1] = -325
             else:
                 pass
         

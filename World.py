@@ -71,20 +71,17 @@ class World(object):
 
     def input(self):
         for e in self.entities:
-            if e.input != None:
-                e.handleInput()
+            e.handleInput()
     def physics(self, time):
         self.lag += time
         while self.lag >= self.MS_PER_UPDATE:
             for e in self.entities:
-                if e.physics != None:
-                    e.update(time)
+                e.update(time)
             self.lag -= self.MS_PER_UPDATE
     def render(self):
         self.screen.blit(self.image, (0,0))
         for e in self.entities:
-            if e.graphics != None:
-                e.render()
+            e.render()
 
     def addEntity(self, Entity):
         if type(Entity) == Player:

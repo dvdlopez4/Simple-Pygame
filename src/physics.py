@@ -24,10 +24,6 @@ class PhysicsComponent(object):
         Entity.velocity[1] += self.acceleration[1] * time
         if Entity.velocity[1] > 0: Entity.velocity[1] += self.acceleration[1] * time
 
-        if Entity.rect.centery > 1280: 
-            Entity.rect.center = 100, 200
-            Entity.velocity[1] = 0
-
         Entity.velocity[0] = 0
   
     def move_single_axis(self, Entity, dx, dy):

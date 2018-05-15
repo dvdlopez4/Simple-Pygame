@@ -25,12 +25,12 @@ class InputComponent(object):
 
     def update(self, Entity):
         key = pygame.key.get_pressed()
-        button = self.joysticks[0].get_button(0)
+        button = self.joysticks[0].get_button(1)
         self.boost = False
         if not button:
             self.isPressed = False
             if Entity.velocity[1] < 0 and Entity.state == 1:
-                Entity.velocity[1] *= 0.35            
+                Entity.velocity[1] *= 0.35
             
         if button and not self.isPressed:
             self.isPressed = True
@@ -55,7 +55,7 @@ class InputComponent(object):
         if self.joysticks[0].get_axis(0) > 0.25:
             Entity.velocity[0] = 185
             if self.boost and Entity.velocity[0] < 280:
-                Entity.velocity[0] *= 1.4       
+                Entity.velocity[0] *= 1.4
 
 class InputComponent2(object):
 
@@ -92,11 +92,6 @@ class InputComponent2(object):
             Entity.velocity[0] = -150
         if key[pygame.K_RIGHT]:
             Entity.velocity[0] = 150
-
-        if key[pygame.K_f] and not self.isRightPressed:
-            self.isRightPressed = True
-            if self.state == 0:
-                Entity.velocity[0] = 2000 
 
 class BotInput(object):
     def __init__(self, world, screen):

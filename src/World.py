@@ -1,12 +1,13 @@
 import os
 import pygame
+import json
 from player import *
 from physics import *
 from inputs import *
 from graphics import *
 from math import *
 from Wall import *
-from entity import *
+from EndBlock import *
 from pygame.locals import *
 
 class World(object):
@@ -23,28 +24,37 @@ class World(object):
         self.screen = pygame.display.set_mode((1280, 720),pygame.NOFRAME)
         myfont = pygame.font.SysFont("monospace", 34, bold=True)
         pygame.joystick.init()
+        self.level = 0
         self.loadAssets()
 
 
-
-    def loadAssets(self):
-
-        f = open("../levels/world.data", "r")
-        World_Map = f.readlines()
+    def loadLevel(self, number):
+        f = open(self.data["levels"][number]["path"], "r")
+        level = f.readlines()
         f.close()
         x = y = 0
         square = 20
         rawImage = pygame.image.load('../assets/platform.png')
-        for row in World_Map:
+        for row in level:
             for char in row:
                 if char == 'w':
-                    self.addEntity(Wall(None, None, GraphicsComponent(self.screen, rawImage),x,y,square + 15,square))
+                    self.addEntity(Wall(None, None, GraphicsComponent(self.screen, rawImage),x,y,square,square))
+                if char == 'e':
+                    self.end = EndBlock(x, y, square, square)
+                if char == 's':
+                    self.start = x, y
                 x += square
             y += square
             x = 0
-
-        player = Player(InputComponent(), PhysicsComponent(self), PlayerGraphics(self.screen))
+        player = Player(InputComponent2(), PhysicsComponent(self), PlayerGraphics(self.screen))
         self.addEntity(player)
+
+    def loadAssets(self):
+        f = open("data.json", "r")
+        self.data = json.load(f)
+        f.close()
+
+        self.loadLevel(self.level)
 
         rawImage = pygame.image.load('../assets/forest.jpg')
         self.image = pygame.transform.scale(rawImage, (1280, 720))
@@ -62,6 +72,15 @@ class World(object):
                 if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
                     running = False
 
+            if self.end.check(self.players[0]):
+                self.entities.clear()
+                self.players.clear()
+                self.level += 1
+                self.loadLevel(self.level)
+                self.players[0].rect.center = self.start
+
+            if self.players[0].rect.y > 1280:
+                self.players[0].rect.center = self.start
             self.input()
             self.physics(time)
             self.render()

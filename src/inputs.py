@@ -109,27 +109,5 @@ class BotInput(object):
             if Entity.inRange:
                 Entity.rect.centerx += (x / normalizer) * 2
                 Entity.rect.centery += (y / normalizer) * 2
-
-        if Entity.totalTime <= Entity.shootRate:
-            Entity.totalTime += 16
-            Entity.shot = False
-        else:
-            Entity.inRange = False
-            self.shoot(Entity)
-            Entity.shot = True
-            Entity.totalTime = 0
-
-    def shoot(self, Entity):
-        for e in self.world.players:
-            x = e.rect.centerx - Entity.rect.centerx
-            y = e.rect.centery - Entity.rect.centery
-            
-            normalizer = sqrt(pow(x, 2) + pow(y, 2))
-            if normalizer <= Entity.range:
+            if normalizer <= Entity.range: 
                 Entity.inRange = True
-                
-                x = modRound((self.magnitude / normalizer) * x)
-                y = modRound((self.magnitude / normalizer) * y)
-                tempProjectile = Projectile(None, ProjectilePhysics(self.world), GraphicsComponent(self.screen),[x,y])
-                tempProjectile.rect.center = Entity.rect.centerx + x, Entity.rect.centery + y
-                self.world.addEntity(tempProjectile)

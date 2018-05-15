@@ -8,6 +8,7 @@ from graphics import *
 from math import *
 from Wall import *
 from EndBlock import *
+from Bot import *
 from pygame.locals import *
 
 class World(object):
@@ -43,10 +44,12 @@ class World(object):
                     self.end = EndBlock(x, y, square, square)
                 if char == 's':
                     self.start = x, y
+                if char == 'b':
+                    self.addEntity(Bot(BotInput(self, self.screen), None, BotGraphics(self.screen)))
                 x += square
             y += square
             x = 0
-        player = Player(InputComponent2(), PhysicsComponent(self), PlayerGraphics(self.screen))
+        player = Player(InputComponent(), PhysicsComponent(self), PlayerGraphics(self.screen))
         self.addEntity(player)
 
     def loadAssets(self):

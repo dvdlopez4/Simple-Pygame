@@ -1,3 +1,5 @@
+from entity import *
+
 class Bot(Entity):
     def __init__(self, _input, _physics, _graphics):
         super(Bot, self).__init__(_input, _physics, _graphics)

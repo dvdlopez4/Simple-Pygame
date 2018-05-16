@@ -1,5 +1,6 @@
 
 import pygame
+import time
 from math import *
 from physics import *
 from graphics import *
@@ -111,3 +112,21 @@ class BotInput(object):
                 Entity.rect.centery += (y / normalizer) * 2
             if normalizer <= Entity.range: 
                 Entity.inRange = True
+
+class DumbBot(object):
+    def __init__(self, world):
+        self.direction = -1
+        self.players = world.players
+        self.state = 0
+
+    def update(self, Entity):
+        # Entity.velocity[0] = 50 * self.direction
+        if Entity.state == 0:
+            Entity.velocity[1] = -400
+            Entity.state = 1
+
+
+        for player in self.players:
+            if Entity.rect.colliderect(player.rect):
+                player.health = 0
+                time.sleep(0.25)

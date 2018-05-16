@@ -32,12 +32,4 @@ class BotGraphics(object):
         self.red = 155
 
     def update(self, Entity):
-        if self.area:
-            pygame.draw.circle(self.screen, (255,255,255), Entity.rect.center, Entity.range, 1)
-
-        self.red = 155
-        Entity.rect.w, Entity.rect.h = 5,5
-        if Entity.inRange:
-            self.red = 255
-
-        pygame.draw.rect(self.screen, (self.red, 155, 155), Entity.rect, 0)
+        pygame.draw.rect(self.screen, (200, 155, 155), Entity.rect, 0)

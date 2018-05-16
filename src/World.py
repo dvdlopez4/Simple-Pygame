@@ -45,11 +45,13 @@ class World(object):
                 if char == 's':
                     self.start = x, y
                 if char == 'b':
-                    self.addEntity(Bot(BotInput(self, self.screen), None, BotGraphics(self.screen)))
+                    bot = Bot(DumbBot(self), PhysicsComponent(self), BotGraphics(self.screen))
+                    bot.rect.center = x, y
+                    self.addEntity(bot)
                 x += square
             y += square
             x = 0
-        player = Player(InputComponent(), PhysicsComponent(self), PlayerGraphics(self.screen))
+        player = Player(InputComponent2(), PhysicsComponent(self), PlayerGraphics(self.screen))
         self.addEntity(player)
 
     def loadAssets(self):
@@ -82,8 +84,14 @@ class World(object):
                 self.loadLevel(self.level)
                 self.players[0].rect.center = self.start
 
-            if self.players[0].rect.y > 1280:
+
+            if self.players[0].rect.y > 1280 or self.players[0].health <= 0:
+                self.entities.clear()
+                self.players.clear()
+                self.loadLevel(self.level)
+                self.players[0].health = 150
                 self.players[0].rect.center = self.start
+
             self.input()
             self.physics(time)
             self.render()

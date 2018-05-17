@@ -32,7 +32,7 @@ class InputComponent(object):
             self.isPressed = False
             if Entity.velocity[1] < 0 and Entity.state == 1:
                 Entity.velocity[1] *= 0.35
-            
+
         if button and not self.isPressed:
             self.isPressed = True
             if Entity.state == 0:
@@ -43,7 +43,7 @@ class InputComponent(object):
                 Entity.velocity[1] = -325
             else:
                 pass
-        
+
 
         if self.joysticks[0].get_axis(2) <= -0.85 and self.joysticks[0].get_axis(2) >= -1.0:
             self.boost = True
@@ -110,21 +110,24 @@ class BotInput(object):
             if Entity.inRange:
                 Entity.rect.centerx += (x / normalizer) * 2
                 Entity.rect.centery += (y / normalizer) * 2
-            if normalizer <= Entity.range: 
+            if normalizer <= Entity.range:
                 Entity.inRange = True
 
 class DumbBot(object):
     def __init__(self, world):
-        self.direction = -1
+        self.direction = 1
         self.players = world.players
         self.state = 0
 
     def update(self, Entity):
-        # Entity.velocity[0] = 50 * self.direction
-        if Entity.state == 0:
-            Entity.velocity[1] = -400
-            Entity.state = 1
 
+        Entity.velocity[0] = 100 * self.direction
+        if Entity.state == 0:
+            Entity.velocity[1] = -250
+            Entity.state = 1
+            self.direction = 1
+            if Entity.rect.x > self.players[0].rect.x:
+                self.direction = -1
 
         for player in self.players:
             if Entity.rect.colliderect(player.rect):

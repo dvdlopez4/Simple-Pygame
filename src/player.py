@@ -12,3 +12,4 @@ class Player(Entity):
         self.collide = False
         self.ID = -1
         self.health = 150
+        self.mass = 1

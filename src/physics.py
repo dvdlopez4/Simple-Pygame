@@ -20,12 +20,12 @@ class PhysicsComponent(object):
         if Entity.velocity[1] != 0:
             self.move_single_axis(Entity, 0, Entity.velocity[1] * time)
 
-        Entity.velocity[0] += self.acceleration[0] * time
-        Entity.velocity[1] += self.acceleration[1] * time
-        if Entity.velocity[1] > 0: Entity.velocity[1] += self.acceleration[1] * time
+        Entity.velocity[0] += self.acceleration[0] * time * Entity.mass
+        Entity.velocity[1] += self.acceleration[1] * time * Entity.mass
+        # if Entity.velocity[1] > 0: Entity.velocity[1] += self.acceleration[1] * time * Entity.mass
 
-        Entity.velocity[0] = 0
-  
+        Entity.velocity[0] -= Entity.velocity[0]
+
     def move_single_axis(self, Entity, dx, dy):
         dx = modRound(dx)
         dy = modRound(dy)

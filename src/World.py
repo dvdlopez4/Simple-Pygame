@@ -33,7 +33,7 @@ class World(object):
         self.players.clear()
         x = y = 0
         square = 20
-        rawImage = pygame.image.load('../assets/platform.png')
+        rawImage = pygame.image.load('../assets/platform.png').convert()
         enemyImage = pygame.image.load('../assets/enemy.png').convert_alpha()
         enemyImage.set_colorkey((0,0,0))
         for row in self.CurrentLevel:
@@ -68,7 +68,7 @@ class World(object):
         f.close()
 
         self.loadLevel(self.level)
-        rawImage = pygame.image.load('../assets/forest.jpg')
+        rawImage = pygame.image.load('../assets/forest.jpg').convert()
         self.image = pygame.transform.scale(rawImage, (1280, 720))
 
     def run(self):

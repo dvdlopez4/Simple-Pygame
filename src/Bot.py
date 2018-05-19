@@ -5,7 +5,7 @@ class Bot(Entity):
         super(Bot, self).__init__(_input, _physics, _graphics)
         self.shootRate = 2500
         self.totalTime = 0
-        self.rect.w, self.rect.h = 60,60
+        self.rect.w, self.rect.h = 30,30
         self.range = 150
         self.inRange = False
         self.shot = False

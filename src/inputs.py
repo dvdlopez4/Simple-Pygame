@@ -68,17 +68,17 @@ class InputComponent2(object):
     def update(self, Entity):
         key = pygame.key.get_pressed()
         current = 0
-        if not key[pygame.K_UP]:
+        if not key[pygame.K_w]:
             self.isUpPressed = False
             if Entity.velocity[1] < 0 and Entity.state == 1:
                 Entity.velocity[1] *= 0.35
 
-        if not key[pygame.K_LEFT]:
+        if not key[pygame.K_a]:
             self.isRightPressed = False
             current = Entity.rect.centerx
             self.state = 0
 
-        if key[pygame.K_UP] and not self.isUpPressed:
+        if key[pygame.K_w] and not self.isUpPressed:
             self.isUpPressed = True
             if Entity.state == 0:
                 Entity.velocity[1] = -350
@@ -89,9 +89,9 @@ class InputComponent2(object):
             else:
                 pass
 
-        if key[pygame.K_LEFT]:
+        if key[pygame.K_a]:
             Entity.velocity[0] = -150
-        if key[pygame.K_RIGHT]:
+        if key[pygame.K_d]:
             Entity.velocity[0] = 150
 
 class BotInput(object):

@@ -54,6 +54,7 @@ class World(object):
             y += square
             x = 0
         player = Player(InputComponent2(), PhysicsComponent(self), PlayerGraphics(self.screen))
+        player.rect.center - self.start
         self.addEntity(player)
 
     def loadLevel(self, number):

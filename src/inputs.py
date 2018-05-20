@@ -1,5 +1,6 @@
 
 import pygame
+import time
 from math import *
 from physics import *
 from graphics import *
@@ -25,13 +26,13 @@ class InputComponent(object):
 
     def update(self, Entity):
         key = pygame.key.get_pressed()
-        button = self.joysticks[0].get_button(0)
+        button = self.joysticks[0].get_button(1)
         self.boost = False
         if not button:
             self.isPressed = False
             if Entity.velocity[1] < 0 and Entity.state == 1:
-                Entity.velocity[1] *= 0.35            
-            
+                Entity.velocity[1] *= 0.35
+
         if button and not self.isPressed:
             self.isPressed = True
             if Entity.state == 0:
@@ -39,10 +40,10 @@ class InputComponent(object):
                 Entity.state = 1
             elif Entity.state == 1:
                 Entity.state = 2
-                Entity.velocity[1] = -225
+                Entity.velocity[1] = -325
             else:
                 pass
-        
+
 
         if self.joysticks[0].get_axis(2) <= -0.85 and self.joysticks[0].get_axis(2) >= -1.0:
             self.boost = True
@@ -55,7 +56,7 @@ class InputComponent(object):
         if self.joysticks[0].get_axis(0) > 0.25:
             Entity.velocity[0] = 185
             if self.boost and Entity.velocity[0] < 280:
-                Entity.velocity[0] *= 1.4       
+                Entity.velocity[0] *= 1.4
 
 class InputComponent2(object):
 
@@ -67,17 +68,17 @@ class InputComponent2(object):
     def update(self, Entity):
         key = pygame.key.get_pressed()
         current = 0
-        if not key[pygame.K_UP]:
+        if not key[pygame.K_w]:
             self.isUpPressed = False
             if Entity.velocity[1] < 0 and Entity.state == 1:
                 Entity.velocity[1] *= 0.35
 
-        if not key[pygame.K_LEFT]:
+        if not key[pygame.K_a]:
             self.isRightPressed = False
             current = Entity.rect.centerx
             self.state = 0
 
-        if key[pygame.K_UP] and not self.isUpPressed:
+        if key[pygame.K_w] and not self.isUpPressed:
             self.isUpPressed = True
             if Entity.state == 0:
                 Entity.velocity[1] = -350
@@ -88,15 +89,10 @@ class InputComponent2(object):
             else:
                 pass
 
-        if key[pygame.K_LEFT]:
+        if key[pygame.K_a]:
             Entity.velocity[0] = -150
-        if key[pygame.K_RIGHT]:
+        if key[pygame.K_d]:
             Entity.velocity[0] = 150
-
-        if key[pygame.K_f] and not self.isRightPressed:
-            self.isRightPressed = True
-            if self.state == 0:
-                Entity.velocity[0] = 2000 
 
 class BotInput(object):
     def __init__(self, world, screen):
@@ -114,27 +110,26 @@ class BotInput(object):
             if Entity.inRange:
                 Entity.rect.centerx += (x / normalizer) * 2
                 Entity.rect.centery += (y / normalizer) * 2
-
-        if Entity.totalTime <= Entity.shootRate:
-            Entity.totalTime += 16
-            Entity.shot = False
-        else:
-            Entity.inRange = False
-            self.shoot(Entity)
-            Entity.shot = True
-            Entity.totalTime = 0
-
-    def shoot(self, Entity):
-        for e in self.world.players:
-            x = e.rect.centerx - Entity.rect.centerx
-            y = e.rect.centery - Entity.rect.centery
-            
-            normalizer = sqrt(pow(x, 2) + pow(y, 2))
             if normalizer <= Entity.range:
                 Entity.inRange = True
-                
-                x = modRound((self.magnitude / normalizer) * x)
-                y = modRound((self.magnitude / normalizer) * y)
-                tempProjectile = Projectile(None, ProjectilePhysics(self.world), GraphicsComponent(self.screen),[x,y])
-                tempProjectile.rect.center = Entity.rect.centerx + x, Entity.rect.centery + y
-                self.world.addEntity(tempProjectile)
+
+class DumbBot(object):
+    def __init__(self, world):
+        self.direction = 1
+        self.players = world.players
+        self.state = 0
+
+    def update(self, Entity):
+
+        Entity.velocity[0] = 100 * self.direction
+        if Entity.state == 0:
+            Entity.velocity[1] = -250
+            Entity.state = 1
+            self.direction = 1
+            if Entity.rect.x > self.players[0].rect.x:
+                self.direction = -1
+
+        for player in self.players:
+            if Entity.rect.colliderect(player.rect):
+                player.health = 0
+                time.sleep(0.25)

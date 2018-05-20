@@ -1,12 +1,14 @@
 import os
 import pygame
+import json
 from player import *
 from physics import *
 from inputs import *
 from graphics import *
 from math import *
 from Wall import *
-from entity import *
+from EndBlock import *
+from Bot import *
 from pygame.locals import *
 
 class World(object):
@@ -23,30 +25,51 @@ class World(object):
         self.screen = pygame.display.set_mode((1280, 720),pygame.NOFRAME)
         myfont = pygame.font.SysFont("monospace", 34, bold=True)
         pygame.joystick.init()
+        self.level = 0
         self.loadAssets()
 
-
-
-    def loadAssets(self):
-
-        f = open("../levels/world.data", "r")
-        World_Map = f.readlines()
-        f.close()
+    def createLevel(self):
+        self.entities.clear()
+        self.players.clear()
         x = y = 0
         square = 20
-        rawImage = pygame.image.load('../assets/platform.png')
-        for row in World_Map:
+        rawImage = pygame.image.load('../assets/platform.png').convert()
+        enemyImage = pygame.image.load('../assets/enemy.png').convert_alpha()
+        enemyImage.set_colorkey((0,0,0))
+        for row in self.CurrentLevel:
             for char in row:
                 if char == 'w':
-                    self.addEntity(Wall(None, None, GraphicsComponent(self.screen, rawImage),x,y,square + 15,square))
+                    self.addEntity(Wall(None, None, GraphicsComponent(self.screen, rawImage),x,y,square,square))
+                if char == 'e':
+                    self.end = EndBlock(x, y, square, square)
+                    self.end.graphics = EndGraphics(self.screen)
+                    self.addEntity(self.end)
+                if char == 's':
+                    self.start = x, y
+                if char == 'b':
+                    bot = Bot(DumbBot(self), PhysicsComponent(self), GraphicsComponent(self.screen, enemyImage))
+                    bot.rect.center = x, y
+                    self.addEntity(bot)
                 x += square
             y += square
             x = 0
-
         player = Player(InputComponent2(), PhysicsComponent(self), PlayerGraphics(self.screen))
+        player.rect.center = self.start
         self.addEntity(player)
 
-        rawImage = pygame.image.load('../assets/forest.jpg')
+    def loadLevel(self, number):
+        f = open(self.data["levels"][number]["path"], "r")
+        self.CurrentLevel = f.readlines()
+        f.close()
+        self.createLevel()
+
+    def loadAssets(self):
+        f = open("data.json", "r")
+        self.data = json.load(f)
+        f.close()
+
+        self.loadLevel(self.level)
+        rawImage = pygame.image.load('../assets/forest.jpg').convert()
         self.image = pygame.transform.scale(rawImage, (1280, 720))
 
     def run(self):
@@ -61,6 +84,17 @@ class World(object):
                     running = False
                 if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
                     running = False
+
+            if self.end.check(self.players[0]):
+                self.level += 1
+                self.loadLevel(self.level)
+                self.players[0].rect.center = self.start
+
+
+            if self.players[0].rect.y > 1280 or self.players[0].health <= 0:
+                self.createLevel()
+                self.players[0].health = 150
+                self.players[0].rect.center = self.start
 
             self.input()
             self.physics(time)

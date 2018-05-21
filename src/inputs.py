@@ -71,11 +71,11 @@ class InputComponent2(object):
     def update(self, Entity):
         key = pygame.key.get_pressed()
         current = 0
-        if not key[pygame.K_w]:
+        if not key[pygame.K_SPACE]:
             self.isUpPressed = False
             if Entity.velocity[1] < 0 and Entity.state == 1:
                 Entity.velocity[1] *= 0.35
-        if not key[pygame.K_f]:
+        if not key[pygame.K_c]:
             self.isDashPressed = False
 
 
@@ -90,7 +90,7 @@ class InputComponent2(object):
                 self.state = 0
 
         if Entity.state == 0: self.canDash = True
-        if key[pygame.K_w] and not self.isUpPressed:
+        if key[pygame.K_SPACE] and not self.isUpPressed:
             self.isUpPressed = True
             if Entity.state == 0:
                 Entity.velocity[1] = -350
@@ -108,7 +108,7 @@ class InputComponent2(object):
             Entity.velocity[0] = 150
             self.isFacingRight = True
 
-        if key[pygame.K_f] and not self.isDashPressed and self.canDash:
+        if key[pygame.K_c] and not self.isDashPressed and self.canDash:
             self.isDashPressed = True
             if self.state == 0:
                 self.DashTime = 10

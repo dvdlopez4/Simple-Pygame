@@ -62,8 +62,11 @@ class InputComponent2(object):
 
     def __init__(self):
         self.isUpPressed = False
-        self.isRightPressed = False
+        self.isDashPressed = False
         self.state = 0
+        self.DashTime = 0
+        self.isFacingRight = True
+        self.canDash = True
 
     def update(self, Entity):
         key = pygame.key.get_pressed()
@@ -72,12 +75,21 @@ class InputComponent2(object):
             self.isUpPressed = False
             if Entity.velocity[1] < 0 and Entity.state == 1:
                 Entity.velocity[1] *= 0.35
+        if not key[pygame.K_f]:
+            self.isDashPressed = False
 
-        if not key[pygame.K_a]:
-            self.isRightPressed = False
-            current = Entity.rect.centerx
-            self.state = 0
 
+        if self.state == 1:
+            if self.DashTime > 0:
+                if not self.isFacingRight:
+                    Entity.velocity = [-350, 0]
+                else:
+                    Entity.velocity = [350, 0]
+            self.DashTime -= 1
+            if self.DashTime <= 0:
+                self.state = 0
+
+        if Entity.state == 0: self.canDash = True
         if key[pygame.K_w] and not self.isUpPressed:
             self.isUpPressed = True
             if Entity.state == 0:
@@ -89,10 +101,19 @@ class InputComponent2(object):
             else:
                 pass
 
-        if key[pygame.K_a]:
+        if key[pygame.K_a] and self.state != 1:
             Entity.velocity[0] = -150
-        if key[pygame.K_d]:
+            self.isFacingRight = False
+        if key[pygame.K_d] and self.state != 1:
             Entity.velocity[0] = 150
+            self.isFacingRight = True
+
+        if key[pygame.K_f] and not self.isDashPressed and self.canDash:
+            self.isDashPressed = True
+            if self.state == 0:
+                self.DashTime = 10
+                self.state = 1
+                self.canDash = False
 
 class BotInput(object):
     def __init__(self, world, screen):

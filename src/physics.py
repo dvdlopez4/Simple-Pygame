@@ -20,6 +20,8 @@ class PhysicsComponent(object):
         if Entity.velocity[1] != 0:
             self.move_single_axis(Entity, 0, Entity.velocity[1] * time)
 
+        if Entity.velocity[1] != 0 and Entity.state == 0:
+            Entity.state = 1
         Entity.velocity[0] += self.acceleration[0] * time * Entity.mass
         Entity.velocity[1] += self.acceleration[1] * time * Entity.mass
         # if Entity.velocity[1] > 0: Entity.velocity[1] += self.acceleration[1] * time * Entity.mass
@@ -33,17 +35,17 @@ class PhysicsComponent(object):
 
         Entity.rect.centerx += dx
         Entity.rect.centery += dy
-        for e in self.world.entities:
-            if e.collide and e != Entity and Entity.rect.colliderect(e.rect):
+        for platform in self.world.platforms:
+            if platform != Entity and Entity.rect.colliderect(platform.rect):
                 if dx > 0:
-                    Entity.rect.right = e.rect.left
+                    Entity.rect.right = platform.rect.left
                 if dx < 0:
-                    Entity.rect.left = e.rect.right
+                    Entity.rect.left = platform.rect.right
                 if dy < 0:
-                    Entity.rect.top = e.rect.bottom
+                    Entity.rect.top = platform.rect.bottom
                     Entity.velocity[1] -= Entity.velocity[1]
                 if dy > 0:
                     Entity.state = 0
                     Entity.velocity[1] -= Entity.velocity[1]
-                    Entity.rect.bottom = e.rect.top
+                    Entity.rect.bottom = platform.rect.top
                 break

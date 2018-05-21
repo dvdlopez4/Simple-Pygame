@@ -14,6 +14,7 @@ from pygame.locals import *
 class World(object):
     def __init__(self):
         self.entities = []
+        self.platforms = []
         self.players = []
         self.lag = 0
         self.MS_PER_UPDATE = 16
@@ -23,7 +24,6 @@ class World(object):
 
         pygame.display.set_caption("Simple Game")
         self.screen = pygame.display.set_mode((1280, 720),pygame.NOFRAME)
-        myfont = pygame.font.SysFont("monospace", 34, bold=True)
         pygame.joystick.init()
         self.level = 0
         self.loadAssets()
@@ -31,15 +31,23 @@ class World(object):
     def createLevel(self):
         self.entities.clear()
         self.players.clear()
+        self.platforms.clear()
         x = y = 0
         square = 20
         rawImage = pygame.image.load('../assets/platform.png').convert()
         enemyImage = pygame.image.load('../assets/enemy.png').convert_alpha()
-        enemyImage.set_colorkey((0,0,0))
+        currentX = 0
+        currentY = 0
+        wallCount = 0
         for row in self.CurrentLevel:
             for char in row:
+                isWall = False
                 if char == 'w':
-                    self.addEntity(Wall(None, None, GraphicsComponent(self.screen, rawImage),x,y,square,square))
+                    isWall = True
+                    wallCount += 1
+                    if not currentX and not currentY:
+                        currentX = x
+                        currentY = y
                 if char == 'e':
                     self.end = EndBlock(x, y, square, square)
                     self.end.graphics = EndGraphics(self.screen)
@@ -50,6 +58,9 @@ class World(object):
                     bot = Bot(DumbBot(self), PhysicsComponent(self), GraphicsComponent(self.screen, enemyImage))
                     bot.rect.center = x, y
                     self.addEntity(bot)
+                if currentX or currentY and not isWall:
+                    self.platforms.append(Wall(None, None, GraphicsComponent(self.screen, rawImage),currentX,currentY,square * wallCount,square))
+                    currentX = currentY = wallCount = 0
                 x += square
             y += square
             x = 0
@@ -116,6 +127,9 @@ class World(object):
         self.screen.blit(self.image, (0,0))
         for e in self.entities:
             e.render()
+
+        for platform in self.platforms:
+            platform.render()
 
     def addEntity(self, Entity):
         if type(Entity) == Player:

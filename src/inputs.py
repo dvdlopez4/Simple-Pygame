@@ -6,14 +6,6 @@ from physics import *
 from graphics import *
 from entity import *
 
-class Projectile(Entity):
-    def __init__(self,  _input, _physics, _graphics, velocity):
-        super(Projectile, self).__init__(_input, _physics, _graphics)
-        self.velocity = velocity
-        self.position = [0,0]
-        self.rect = pygame.Rect(0,0,10,10)
-        self.age = 200
-
 
 class InputComponent(object):
 
@@ -58,81 +50,119 @@ class InputComponent(object):
             if self.boost and Entity.velocity[0] < 280:
                 Entity.velocity[0] *= 1.4
 
+
+class StandingState(object):
+    def __init__(self):
+        self.isJumpPressed = False
+        self.releasedKeys = pygame.key.get_pressed()
+
+    def handleInput(self, Entity, key):
+        if key[pygame.K_SPACE] and not self.releasedKeys[pygame.K_SPACE] and Entity.isOnGround:
+            return JumpState()
+
+        if key[pygame.K_v] and not self.releasedKeys[pygame.K_v]:
+            return DashState()
+
+        if not Entity.isOnGround:
+            return FallState()
+
+        self.releasedKeys = pygame.key.get_pressed()
+
+        return None
+
+    def update(self, Entity):
+        pass
+
+    def enter(self, Entity, key):
+        Entity.canDash = True
+
+class DashState(object):
+    def __init__(self, limit = -1):
+        self.DashFrames = 10
+        self.velocity = [350,0]
+        self.limit = limit
+
+    def handleInput(self, Entity, key):
+        if self.DashFrames <= 0:
+            Entity.canDash = False
+            return FallState()
+
+        self.DashFrames -= 1
+        return None
+
+    def update(self, Entity):
+        Entity.velocity[0] = self.velocity[0]
+        Entity.velocity[1] = self.velocity[1]
+
+    def enter(self, Entity, key):
+        if Entity.velocity[0] >= 0:
+            self.velocity = [350,0]
+        else:
+            self.velocity = [-350,0]
+
+class JumpState(object):
+    def __init__(self):
+        pass
+
+    def handleInput(self, Entity, key):
+        return FallState()
+
+    def update(self, Entity):
+        Entity.velocity[1] = -350
+
+    def enter(self, Entity, key):
+        pass
+
+class FallState(object):
+    def __init__(self):
+        self.releasedKeys = pygame.key.get_pressed()
+
+    def handleInput(self, Entity, key):
+        if Entity.isOnGround:
+            return StandingState()
+
+        if key[pygame.K_v] and not self.releasedKeys[pygame.K_v] and Entity.canDash:
+            return DashState()
+
+        if not key[pygame.K_SPACE]:
+            if Entity.velocity[1] < 0 and not Entity.isOnGround:
+                Entity.velocity[1] *= 0.35
+
+        self.releasedKeys = pygame.key.get_pressed()
+
+        return None
+
+
+    def update(self, Entity):
+        pass
+
+    def enter(self, Entity, key):
+        pass
+
+
 class InputComponent2(object):
 
     def __init__(self):
-        self.isUpPressed = False
-        self.isDashPressed = False
         self.state = 0
-        self.DashTime = 0
-        self.isFacingRight = True
-        self.canDash = True
+        self.state_ = StandingState()
+        self.keyHeld = None
+        self.keyReleased = None
 
     def update(self, Entity):
         key = pygame.key.get_pressed()
-        current = 0
-        if not key[pygame.K_SPACE]:
-            self.isUpPressed = False
-            if Entity.velocity[1] < 0 and Entity.state == 1:
-                Entity.velocity[1] *= 0.35
-        if not key[pygame.K_c]:
-            self.isDashPressed = False
+
+        if key[pygame.K_a]: Entity.velocity[0] = -150
+        if key[pygame.K_d]: Entity.velocity[0] = 150
+
+        Entity.state = self.state_.handleInput(Entity, key)
+        if Entity.state != None:
+            self.state_ = Entity.state
+            self.state_.enter(Entity, key)
+
+        self.state_.update(Entity)
 
 
-        if self.state == 1:
-            if self.DashTime > 0:
-                if not self.isFacingRight:
-                    Entity.velocity = [-350, 0]
-                else:
-                    Entity.velocity = [350, 0]
-            self.DashTime -= 1
-            if self.DashTime <= 0:
-                self.state = 0
 
-        if Entity.state == 0: self.canDash = True
-        if key[pygame.K_SPACE] and not self.isUpPressed:
-            self.isUpPressed = True
-            if Entity.state == 0:
-                Entity.velocity[1] = -350
-                Entity.state = 1
-            elif Entity.state == 1:
-                Entity.velocity[1] = -325
-                Entity.state = 2
-            else:
-                pass
-
-        if key[pygame.K_a] and self.state != 1:
-            Entity.velocity[0] = -150
-            self.isFacingRight = False
-        if key[pygame.K_d] and self.state != 1:
-            Entity.velocity[0] = 150
-            self.isFacingRight = True
-
-        if key[pygame.K_c] and not self.isDashPressed and self.canDash:
-            self.isDashPressed = True
-            if self.state == 0:
-                self.DashTime = 10
-                self.state = 1
-                self.canDash = False
-
-class BotInput(object):
-    def __init__(self, world, screen):
-        self.world = world
-        self.screen = screen
-        self.magnitude = 8
-
-    def update(self, Entity):
-        for e in self.world.players:
-            x = e.rect.centerx - Entity.rect.centerx
-            y = e.rect.centery - Entity.rect.centery
-            normalizer = sqrt(pow(x, 2) + pow(y, 2))
-            if normalizer == 0:
-                normalizer = 0.01
-            if Entity.inRange:
-                Entity.rect.centerx += (x / normalizer) * 2
-                Entity.rect.centery += (y / normalizer) * 2
-            if normalizer <= Entity.range:
-                Entity.inRange = True
 
 class DumbBot(object):
     def __init__(self, world):

@@ -7,8 +7,8 @@ class Entity(object):
         self.graphics = _graphics
         self.rect = pg.Rect(0,0,0,0)
         self.velocity = [0,0]
-        self.collide = False
         self.mass = 0.25
+        self.isOnGround = True
 
     def handleInput(self):
         if self.input != None: self.input.update(self)

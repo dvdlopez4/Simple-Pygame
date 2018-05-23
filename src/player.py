@@ -11,3 +11,4 @@ class Player(Entity):
         self.health = 150
         self.state = None
         self.canDash = True
+        self.canJump = True

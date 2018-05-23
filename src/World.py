@@ -1,14 +1,16 @@
 import os
 import pygame
 import json
-from player import *
 from physics import *
-from inputs import *
+from DumbBot import *
+from player import *
 from graphics import *
 from math import *
 from Wall import *
 from EndBlock import *
 from Bot import *
+from KeyBoardInput import *
+from GamePadInput import *
 from pygame.locals import *
 
 class World(object):
@@ -64,7 +66,7 @@ class World(object):
                 x += square
             y += square
             x = 0
-        player = Player(InputComponent2(), PhysicsComponent(self), PlayerGraphics(self.screen))
+        player = Player(GamePadInput(), PhysicsComponent(self), PlayerGraphics(self.screen))
         player.rect.center = self.start
         self.addEntity(player)
 
@@ -86,6 +88,7 @@ class World(object):
     def run(self):
         total = 0
         running = True
+        paused = False
         clock = pygame.time.Clock()
         while running:
             time = clock.get_time()
@@ -95,6 +98,9 @@ class World(object):
                     running = False
                 if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
                     running = False
+                if e.type == pygame.KEYDOWN and e.key == pygame.K_p:
+                    paused = not paused
+
 
             if self.end.check(self.players[0]):
                 self.level += 1
@@ -107,8 +113,9 @@ class World(object):
                 self.players[0].health = 150
                 self.players[0].rect.center = self.start
 
-            self.input()
-            self.physics(time)
+            if not paused:
+                self.input()
+                self.physics(time)
             self.render()
             pygame.display.update()
             clock.tick(60)

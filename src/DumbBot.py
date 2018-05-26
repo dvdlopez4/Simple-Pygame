@@ -25,5 +25,6 @@ class DumbBot(object):
 
         for player in self.players:
             if Entity.rect.colliderect(player.rect):
-                player.health = 0
+                player.health -= 10
                 time.sleep(0.25)
+                break

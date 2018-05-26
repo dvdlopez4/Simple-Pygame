@@ -11,3 +11,4 @@ class Bot(Entity):
         self.shot = False
         self.state = 0
         self.mass = 0.50
+        self.health = 100

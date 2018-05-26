@@ -1,4 +1,5 @@
 from entity import *
+from DamageBlock import *
 
 class Player(Entity):
     """docstring for Player"""
@@ -12,3 +13,4 @@ class Player(Entity):
         self.state = None
         self.canDash = True
         self.canJump = True
+        self.block = DamageBlock()

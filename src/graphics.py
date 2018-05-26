@@ -22,6 +22,9 @@ class PlayerGraphics(object):
 
         self.color = (150 - green, green, 0)
         pygame.draw.rect(self.screen, self.color, Entity.rect)
+        if Entity.block.isVisible:
+            pygame.draw.rect(self.screen, (255,0,0), Entity.block.rect, 1)
+            Entity.block.isVisible = False
 
 class EndGraphics(object):
     def __init__(self, screen):

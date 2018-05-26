@@ -46,6 +46,9 @@ class DashState(object):
         Entity.velocity[0] = self.velocity[0]
         Entity.velocity[1] = self.velocity[1]
 
+    def exit(self, Entity, Input):
+        pass
+
     def enter(self, Entity, Input):
         if Entity.velocity[0] >= 0:
             self.velocity = [450,0]
@@ -61,6 +64,9 @@ class JumpState(object):
 
     def update(self, Entity):
         Entity.velocity[1] = -350
+
+    def exit(self, Entity, Input):
+        pass
 
     def enter(self, Entity, Input):
         pass
@@ -90,6 +96,9 @@ class FallState(object):
         return None
 
     def update(self, Entity):
+        pass
+
+    def exit(self, Entity, Input):
         pass
 
     def enter(self, Entity, Input):

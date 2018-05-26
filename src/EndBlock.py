@@ -6,6 +6,7 @@ class EndBlock(Entity):
     def __init__(self, x, y, w, h):
         super(EndBlock, self).__init__(None, None, None)
         self.rect = pygame.Rect(x, y, w, h)
+        self.health = 100
 
     def check(self, player):
         if player.rect.colliderect(self.rect):

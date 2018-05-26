@@ -66,7 +66,7 @@ class World(object):
                 x += square
             y += square
             x = 0
-        player = Player(GamePadInput(), PhysicsComponent(self), PlayerGraphics(self.screen))
+        player = Player(GamePadInput(self), PhysicsComponent(self), PlayerGraphics(self.screen))
         player.rect.center = self.start
         self.addEntity(player)
 
@@ -124,6 +124,8 @@ class World(object):
     def input(self):
         for e in self.entities:
             e.handleInput()
+            if e.health < 0:
+                self.entities.remove(e)
     def physics(self, time):
         self.lag += time
         while self.lag >= self.MS_PER_UPDATE:

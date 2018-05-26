@@ -21,8 +21,8 @@ class PhysicsComponent(object):
             Entity.isOnGround = False
             self.move_single_axis(Entity, 0, Entity.velocity[1] * time)
 
-        Entity.velocity[0] += self.acceleration[0] * time * Entity.mass
-        Entity.velocity[1] += self.acceleration[1] * time * Entity.mass
+        Entity.velocity[0] += Entity.acceleration[0] * time * Entity.mass
+        Entity.velocity[1] += Entity.acceleration[1] * time * Entity.mass
         if Entity.velocity[1] > 0: Entity.velocity[1] += self.acceleration[1] * time * Entity.mass
 
         Entity.velocity[0] -= Entity.velocity[0]

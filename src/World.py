@@ -90,9 +90,12 @@ class World(object):
         running = True
         paused = False
         clock = pygame.time.Clock()
+        x = 0
         while running:
             time = clock.get_time()
             self.screen.fill((0, 0, 0))
+            x += 1
+
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
                     running = False

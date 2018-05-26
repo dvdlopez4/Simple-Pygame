@@ -47,4 +47,4 @@ class GamePadInput(object):
             self.state_ = Entity.state
             self.state_.enter(Entity, self)
 
-        self.state_.update(Entity, self)
+        self.state_.update(Entity)

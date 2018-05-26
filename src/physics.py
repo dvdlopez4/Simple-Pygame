@@ -15,10 +15,10 @@ class PhysicsComponent(object):
     def update(self, Entity, time):
         time /= 1000
 
+        Entity.isOnGround = False
         if Entity.velocity[0] != 0:
             self.move_single_axis(Entity, Entity.velocity[0] * time, 0)
         if Entity.velocity[1] != 0:
-            Entity.isOnGround = False
             self.move_single_axis(Entity, 0, Entity.velocity[1] * time)
 
         Entity.velocity[0] += Entity.acceleration[0] * time * Entity.mass

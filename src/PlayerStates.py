@@ -8,20 +8,21 @@ class StandingState(object):
         self.ButtonsReleased = np.zeros((20,), dtype=int)
 
     def handleInput(self, Entity, Input):
-        if Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]] and Entity.isOnGround:
+        if Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]]:
             return JumpState()
 
         if Input.Buttons[Input.Actions["Dash"]] and not self.ButtonsReleased[Input.Actions["Dash"]]:
             return DashState()
 
-        if not Entity.isOnGround:
-            return FallState()
 
         self.ButtonsReleased = Input.GetButtons()
 
         return None
 
-    def update(self, Entity):
+    def update(self, Entity, Input):
+        pass
+
+    def exit(self, Entity, Input):
         pass
 
     def enter(self, Entity, Input):
@@ -37,12 +38,15 @@ class DashState(object):
     def handleInput(self, Entity, Input):
         if self.DashFrames <= 0:
             Entity.canDash = False
-            return FallState()
+            if Entity.isOnGround:
+                return StandingState()
+            else:
+                return JumpState()
 
         self.DashFrames -= 1
         return None
 
-    def update(self, Entity):
+    def update(self, Entity, Input):
         Entity.velocity[0] = self.velocity[0]
         Entity.velocity[1] = self.velocity[1]
 
@@ -57,50 +61,34 @@ class DashState(object):
 
 class JumpState(object):
     def __init__(self):
-        pass
-
-    def handleInput(self, Entity, Input):
-        return FallState()
-
-    def update(self, Entity):
-        Entity.velocity[1] = -350
-
-    def exit(self, Entity, Input):
-        pass
-
-    def enter(self, Entity, Input):
-        pass
-
-class FallState(object):
-    def __init__(self):
         self.ButtonsReleased = np.zeros((20,), dtype=int)
+        self.jumps = 2
 
     def handleInput(self, Entity, Input):
-
         if Entity.isOnGround:
             return StandingState()
-
-        if Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]] and Entity.canJump:
-            Entity.canJump = False
-            return JumpState()
 
         if Input.Buttons[Input.Actions["Dash"]] and not self.ButtonsReleased[Input.Actions["Dash"]] and Entity.canDash:
             return DashState()
 
-        if not Input.Buttons[Input.Actions["Jump"]]:
-            if Entity.velocity[1] < 0 and not Entity.isOnGround:
-                Entity.velocity[1] *= 0.35
+        if self.jumps > 0 and Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]] and not Entity.isOnGround:
+            Entity.isOnGround = True
+            self.jumps -= 1
 
         self.ButtonsReleased = Input.GetButtons()
-
         return None
 
-    def update(self, Entity):
-        pass
+    def update(self, Entity, Input):
+        if Entity.isOnGround:
+            Entity.velocity[1] = -350
+
+        if Entity.velocity[1] < 0 and not self.ButtonsReleased[Input.Actions["Jump"]]:
+            Entity.velocity[1] *= 0.35
 
     def exit(self, Entity, Input):
         pass
 
     def enter(self, Entity, Input):
         self.ButtonsReleased = Input.GetButtons()
+
 

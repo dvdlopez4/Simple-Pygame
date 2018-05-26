@@ -17,14 +17,9 @@ class GamePadInput(object):
             'Left': 6,
             'Jump': 1,
             'Dash': 5,
-            'Attack': 0
         }
         self.Buttons = []
         self.PreviousButtons = np.zeros((self.joysticks[0].get_numbuttons(),), dtype=int)
-        self.world = world
-        self.attacking = False
-        self.attackFrames = 32
-        self.facingRight = True
 
     def GetButtons(self):
         buttons = []
@@ -38,35 +33,12 @@ class GamePadInput(object):
 
         if self.Buttons[self.Actions["Left"]]: Entity.velocity[0] = -150
         if self.Buttons[self.Actions["Right"]]: Entity.velocity[0] = 150
-        if self.Buttons[self.Actions["Attack"]] and not self.PreviousButtons[self.Actions["Attack"]] and not self.attacking:
 
-            Entity.block.rect.bottomleft = Entity.rect.bottomleft
-            Entity.block.rect.height = Entity.rect.height + 10
-            Entity.block.rect.width = 100
-
-            if not self.facingRight:
-                Entity.block.rect.bottomright = Entity.rect.bottomright
-
-            if self.joysticks[0].get_axis(1) < -0.25:
-                Entity.block.rect.center = Entity.rect.centerx, Entity.rect.centery - 50
-                Entity.block.rect.height = 100
-
-            self.attacking = True
-
-        if self.attacking:
-            if self.attackFrames <= 0:
-                self.attacking = False
-                self.attackFrames = 32
-            Entity.block.update(self.world)
-            Entity.block.isVisible = True
-            self.attackFrames -= 1
 
         if self.joysticks[0].get_axis(0) < -0.25:
-            self.facingRight = False
             Entity.velocity[0] = -150
 
         if self.joysticks[0].get_axis(0) > 0.25:
-            self.facingRight = True
             Entity.velocity[0] = 150
 
         Entity.state = self.state_.handleInput(Entity, self)
@@ -75,6 +47,4 @@ class GamePadInput(object):
             self.state_ = Entity.state
             self.state_.enter(Entity, self)
 
-        self.state_.update(Entity)
-        self.PreviousButtons = self.GetButtons()
-
+        self.state_.update(Entity, self)

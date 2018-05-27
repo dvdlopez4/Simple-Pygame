@@ -26,7 +26,7 @@ class World(object):
         pygame.init()
 
         pygame.display.set_caption("Simple Game")
-        self.screen = pygame.display.set_mode((1280, 720),pygame.NOFRAME)
+        self.screen = pygame.display.set_mode((1280, 720))
         pygame.joystick.init()
         self.level = 0
         self.loadAssets()
@@ -95,6 +95,7 @@ class World(object):
         x = 0
         while running:
             time = clock.get_time()
+            pygame.display.set_caption("{:.2f}".format(clock.get_fps()))
             self.screen.fill((0, 0, 0))
             x += 1
 
@@ -140,7 +141,7 @@ class World(object):
                 e.update(time)
             self.lag -= self.MS_PER_UPDATE
     def render(self):
-        # self.screen.blit(self.image, (0,0))
+        self.screen.blit(self.image, (0,0))
         for e in self.entities:
             e.render(self.camera)
 

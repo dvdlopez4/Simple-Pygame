@@ -12,6 +12,7 @@ from Bot import *
 from KeyBoardInput import *
 from GamePadInput import *
 from pygame.locals import *
+from Camera import *
 
 class World(object):
     def __init__(self):
@@ -29,6 +30,7 @@ class World(object):
         pygame.joystick.init()
         self.level = 0
         self.loadAssets()
+        self.camera = Camera(1280, 720)
 
     def createLevel(self):
         self.entities.clear()
@@ -113,12 +115,14 @@ class World(object):
 
             if self.players[0].rect.y > 1280 or self.players[0].health <= 0:
                 self.createLevel()
+                self.camera.topleft = self.start
                 self.players[0].health = 150
                 self.players[0].rect.center = self.start
 
             if not paused:
                 self.input()
                 self.physics(time)
+            self.camera.update(self.players[0])
             self.render()
             pygame.display.update()
             clock.tick(60)
@@ -136,12 +140,12 @@ class World(object):
                 e.update(time)
             self.lag -= self.MS_PER_UPDATE
     def render(self):
-        self.screen.blit(self.image, (0,0))
+        # self.screen.blit(self.image, (0,0))
         for e in self.entities:
-            e.render()
+            e.render(self.camera)
 
         for platform in self.platforms:
-            platform.render()
+            platform.render(self.camera)
 
     def addEntity(self, Entity):
         if type(Entity) == Player:

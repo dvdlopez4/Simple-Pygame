@@ -26,7 +26,7 @@ class World(object):
         pygame.init()
 
         pygame.display.set_caption("Simple Game")
-        self.screen = pygame.display.set_mode((1280, 720))
+        self.screen = pygame.display.set_mode((1280, 720), pygame.DOUBLEBUF)
         pygame.joystick.init()
         self.level = 0
         self.loadAssets()
@@ -86,6 +86,11 @@ class World(object):
         self.loadLevel(self.level)
         rawImage = pygame.image.load('../assets/forest.jpg').convert()
         self.image = pygame.transform.scale(rawImage, (1280, 720))
+        self.fog = pygame.Surface((1280, 720))
+        self.fog.fill((50,50,50))
+        self.light_mask = pygame.image.load('../assets/light.png').convert_alpha()
+        self.light_mask = pygame.transform.scale(self.light_mask, (150,150))
+        self.light_rect = self.light_mask.get_rect()
 
     def run(self):
         total = 0
@@ -147,6 +152,13 @@ class World(object):
 
         for platform in self.platforms:
             platform.render(self.camera)
+
+        self.fog.fill((50,50,50))
+        self.light_rect.center = self.camera.apply(self.players[0]).center
+        self.fog.blit(self.light_mask, self.light_rect)
+        self.screen.blit(self.fog, (0,0), special_flags=pygame.BLEND_MULT)
+
+
 
     def addEntity(self, Entity):
         if type(Entity) == Player:

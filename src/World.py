@@ -84,12 +84,17 @@ class World(object):
         f.close()
 
         self.loadLevel(self.level)
-        rawImage = pygame.image.load('../assets/forest.jpg').convert()
+        rawImage = pygame.image.load('../assets/crap.jpg').convert()
         self.image = pygame.transform.scale(rawImage, (1280, 720))
+        self.foreground = pygame.image.load('../assets/foreground.png').convert_alpha()
+        self.foreground = pygame.transform.scale(self.foreground, (1280, 720))
         self.fog = pygame.Surface((1280, 720))
         self.fog.fill((50,50,50))
         self.light_mask = pygame.image.load('../assets/light.png').convert_alpha()
-        self.light_mask = pygame.transform.scale(self.light_mask, (150,150))
+        self.lamp = pygame.image.load('../assets/lamp.png').convert_alpha()
+        self.lamp_rect = self.lamp.get_rect()
+
+        self.light_mask = pygame.transform.scale(self.light_mask, (200,200))
         self.light_rect = self.light_mask.get_rect()
 
     def run(self):
@@ -149,14 +154,23 @@ class World(object):
         self.screen.blit(self.image, (0,0))
         for e in self.entities:
             e.render(self.camera)
-
         for platform in self.platforms:
             platform.render(self.camera)
 
-        self.fog.fill((50,50,50))
+        self.fog.fill((25,25,25))
+
+        for i in range(len(self.platforms)):
+            if i % 10 == 0:
+                self.lamp_rect.bottomleft = self.camera.apply(self.platforms[i]).topleft
+                self.screen.blit(self.lamp, self.lamp_rect)
+                self.light_rect.center = self.lamp_rect.centerx, self.lamp_rect.centery - 23
+                self.fog.blit(self.light_mask, self.light_rect)
+
         self.light_rect.center = self.camera.apply(self.players[0]).center
         self.fog.blit(self.light_mask, self.light_rect)
+
         self.screen.blit(self.fog, (0,0), special_flags=pygame.BLEND_MULT)
+        self.screen.blit(self.foreground, (0,0))
 
 
 

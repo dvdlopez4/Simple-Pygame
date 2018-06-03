@@ -13,6 +13,7 @@ from KeyBoardInput import *
 from GamePadInput import *
 from pygame.locals import *
 from Camera import *
+import cProfile
 
 class World(object):
     def __init__(self):
@@ -68,7 +69,7 @@ class World(object):
                 x += square
             y += square
             x = 0
-        player = Player(GamePadInput(self), PhysicsComponent(self), PlayerGraphics(self.screen))
+        player = Player(KeyBoardInput(), PhysicsComponent(self), PlayerGraphics(self.screen))
         player.rect.center = self.start
         self.addEntity(player)
 
@@ -90,8 +91,8 @@ class World(object):
         self.foreground = pygame.transform.scale(self.foreground, (1280, 720))
         self.fog = pygame.Surface((1280, 720))
         self.fog.fill((50,50,50))
-        self.light_mask = pygame.image.load('../assets/light.png').convert_alpha()
-        self.lamp = pygame.image.load('../assets/lamp.png').convert_alpha()
+        self.light_mask = pygame.image.load('../assets/light.png').convert()
+        self.lamp = pygame.image.load('../assets/lamp.png').convert()
         self.lamp_rect = self.lamp.get_rect()
 
         self.light_mask = pygame.transform.scale(self.light_mask, (200,200))
@@ -106,7 +107,7 @@ class World(object):
         while running:
             time = clock.get_time()
             pygame.display.set_caption("{:.2f}".format(clock.get_fps()))
-            self.screen.fill((0, 0, 0))
+            # self.screen.fill((0, 0, 0))
             x += 1
 
             for e in pygame.event.get():
@@ -135,6 +136,7 @@ class World(object):
                 self.physics(time)
             self.camera.update(self.players[0])
             self.render()
+            
             pygame.display.update()
             clock.tick(60)
 
@@ -156,21 +158,7 @@ class World(object):
             e.render(self.camera)
         for platform in self.platforms:
             platform.render(self.camera)
-
-        self.fog.fill((25,25,25))
-
-        for i in range(len(self.platforms)):
-            if i % 10 == 0:
-                self.lamp_rect.bottomleft = self.camera.apply(self.platforms[i]).topleft
-                self.screen.blit(self.lamp, self.lamp_rect)
-                self.light_rect.center = self.lamp_rect.centerx, self.lamp_rect.centery - 23
-                self.fog.blit(self.light_mask, self.light_rect)
-
-        self.light_rect.center = self.camera.apply(self.players[0]).center
-        self.fog.blit(self.light_mask, self.light_rect)
-
-        self.screen.blit(self.fog, (0,0), special_flags=pygame.BLEND_MULT)
-        self.screen.blit(self.foreground, (0,0))
+        # self.screen.blit(self.foreground, (0,0))
 
 
 

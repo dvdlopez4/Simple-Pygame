@@ -8,9 +8,9 @@ class GraphicsComponent(object):
 
     def update(self, Entity, camera):
         newImage = pygame.transform.scale(self.image, (Entity.rect.w, Entity.rect.h))
-        # pygame.draw.rect(self.screen, (255, 200, 0), Entity.rect, 0)
-
+        # pygame.draw.rect(self.screen, (255, 200, 0), camera.apply(Entity), 0)
         self.screen.blit(newImage, camera.apply(Entity))
+
 class PlayerGraphics(object):
     def __init__(self, screen):
         self.screen = screen

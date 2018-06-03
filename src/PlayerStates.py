@@ -5,7 +5,7 @@ import numpy as np
 class StandingState(object):
     def __init__(self):
         self.isJumpPressed = False
-        self.ButtonsReleased = np.zeros((20,), dtype=int)
+        self.ButtonsReleased = np.zeros((200,), dtype=int)
 
     def handleInput(self, Entity, Input):
         if Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]] or not Entity.isOnGround:

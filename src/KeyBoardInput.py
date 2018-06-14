@@ -18,13 +18,13 @@ class KeyBoardInput(object):
 
     def update(self, Entity):
         self.Buttons = self.GetButtons()
+        if Entity.invincibility:
+            Entity.invincibility -= 1
+        if Entity.invincibility <= 45:
 
-        if self.Buttons[self.Actions["Left"]]: Entity.velocity[0] = -150
-        if self.Buttons[self.Actions["Right"]]: Entity.velocity[0] = 150
+            Entity.state = self.state_.handleInput(Entity, self)
+            if Entity.state != None:
+                self.state_ = Entity.state
+                self.state_.enter(Entity, self)
 
-        Entity.state = self.state_.handleInput(Entity, self)
-        if Entity.state != None:
-            self.state_ = Entity.state
-            self.state_.enter(Entity, self)
-
-        self.state_.update(Entity)
+            self.state_.update(Entity)

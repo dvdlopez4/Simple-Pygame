@@ -13,7 +13,7 @@ from KeyBoardInput import *
 from GamePadInput import *
 from pygame.locals import *
 from Camera import *
-import cProfile
+import random
 
 class World(object):
     def __init__(self):
@@ -27,18 +27,16 @@ class World(object):
         pygame.init()
 
         pygame.display.set_caption("Simple Game")
-        self.screen = pygame.display.set_mode((1280, 720), pygame.DOUBLEBUF)
+        self.screen = pygame.display.set_mode((1280, 720))
         pygame.joystick.init()
         self.level = 0
         self.loadAssets()
-        self.camera = Camera(1280, 720)
+        self.camera = Camera(760, 720)
 
-    def createLevel(self):
-        self.entities.clear()
-        self.players.clear()
-        self.platforms.clear()
-        x = y = 0
-        square = 20
+    def createLevel(self, x, y):
+        placementx = x
+        placementy = y
+        square = 40
         rawImage = pygame.image.load('../assets/platform.png').convert()
         enemyImage = pygame.image.load('../assets/enemy.png').convert_alpha()
         currentX = 0
@@ -51,64 +49,68 @@ class World(object):
                     isWall = True
                     wallCount += 1
                     if not currentX and not currentY:
-                        currentX = x
-                        currentY = y
+                        currentX = placementx
+                        currentY = placementy
                 if char == 'e':
-                    self.end = EndBlock(x, y, square, square)
+                    self.end = EndBlock(placementx, placementy, square, square)
                     self.end.graphics = EndGraphics(self.screen)
                     self.addEntity(self.end)
                 if char == 's':
-                    self.start = x, y
+                    self.start = placementx, placementy
                 if char == 'b':
                     bot = Bot(DumbBot(self), PhysicsComponent(self), GraphicsComponent(self.screen, enemyImage))
-                    bot.rect.center = x, y
+                    bot.rect.center = placementx, placementy
                     self.addEntity(bot)
-                if currentX or currentY and not isWall:
-                    self.platforms.append(Wall(None, None, GraphicsComponent(self.screen, rawImage),currentX,currentY,square * wallCount,square))
+                if (currentX or currentY) and not isWall:
+                    self.platforms.append(Wall(None, None, GraphicsComponent(self.screen, None),currentX,currentY,square * wallCount,square))
                     currentX = currentY = wallCount = 0
-                x += square
-            y += square
-            x = 0
+                placementx += square
+            placementy += square
+            placementx = x
+
+    def loadLevel(self):
+        f = open(self.data["start"][random.randint(0, len(self.data["start"]) - 1)]["path"], "r")
+        self.CurrentLevel = f.readlines()
+        f.close()
+        self.entities.clear()
+        self.players.clear()
+        self.platforms.clear()
+        self.platforms.append(Wall(None, None, GraphicsComponent(self.screen, None),0,0,1320,40))
+        self.platforms.append(Wall(None, None, GraphicsComponent(self.screen, None),0,0,40,1320))
+        self.platforms.append(Wall(None, None, GraphicsComponent(self.screen, None),1320,0,40,1320))
+
+        self.createLevel(40, 40)
+        for y in range(0,4):
+            for x in range(0,4):
+                f = open(self.data["transitional"][random.randint(0, len(self.data["transitional"]) - 1)]["path"], "r")
+                self.CurrentLevel = f.readlines()
+                f.close()
+                self.createLevel(40 * (1 + 8 * x), 40 * (1 + 8 *y))
+
         player = Player(KeyBoardInput(), PhysicsComponent(self), PlayerGraphics(self.screen))
         player.rect.center = self.start
         self.addEntity(player)
 
-    def loadLevel(self, number):
-        f = open(self.data["levels"][number]["path"], "r")
-        self.CurrentLevel = f.readlines()
-        f.close()
-        self.createLevel()
 
     def loadAssets(self):
         f = open("data.json", "r")
         self.data = json.load(f)
         f.close()
 
-        self.loadLevel(self.level)
-        rawImage = pygame.image.load('../assets/crap.jpg').convert()
+        self.loadLevel()
+        rawImage = pygame.image.load('../assets/game_background_4.png').convert()
         self.image = pygame.transform.scale(rawImage, (1280, 720))
-        self.foreground = pygame.image.load('../assets/foreground.png').convert_alpha()
-        self.foreground = pygame.transform.scale(self.foreground, (1280, 720))
-        self.fog = pygame.Surface((1280, 720))
-        self.fog.fill((50,50,50))
-        self.light_mask = pygame.image.load('../assets/light.png').convert()
-        self.lamp = pygame.image.load('../assets/lamp.png').convert()
-        self.lamp_rect = self.lamp.get_rect()
 
-        self.light_mask = pygame.transform.scale(self.light_mask, (200,200))
-        self.light_rect = self.light_mask.get_rect()
 
     def run(self):
         total = 0
         running = True
         paused = False
         clock = pygame.time.Clock()
-        x = 0
+
         while running:
             time = clock.get_time()
             pygame.display.set_caption("{:.2f}".format(clock.get_fps()))
-            # self.screen.fill((0, 0, 0))
-            x += 1
 
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
@@ -120,21 +122,20 @@ class World(object):
 
 
             if self.end.check(self.players[0]):
-                self.level += 1
-                self.loadLevel(self.level)
+                self.loadLevel()
                 self.players[0].rect.center = self.start
 
 
-            if self.players[0].rect.y > 1280 or self.players[0].health <= 0:
-                self.createLevel()
+            if self.players[0].rect.y > 1320 or self.players[0].health <= 0:
+                self.loadLevel()
                 self.camera.topleft = self.start
-                self.players[0].health = 150
+                self.players[0].health = self.players[0].maxHealth
                 self.players[0].rect.center = self.start
 
             if not paused:
                 self.input()
                 self.physics(time)
-            self.camera.update(self.players[0])
+            self.camera.update(self.players)
             self.render()
             
             pygame.display.update()
@@ -158,6 +159,10 @@ class World(object):
             e.render(self.camera)
         for platform in self.platforms:
             platform.render(self.camera)
+        for hitpoint in range(self.players[0].maxHealth):
+            if hitpoint + 1 <= self.players[0].health:
+                pygame.draw.rect(self.screen, (255, 0, 0), (20 + hitpoint * 23, int(720 * 0.025), 20, 20))
+            pygame.draw.rect(self.screen, (255, 255, 255), (20 + hitpoint * 23, int(720 * 0.025), 20, 20), 2)
         # self.screen.blit(self.foreground, (0,0))
 
 

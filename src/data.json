@@ -1,12 +1,11 @@
-{ "levels": [
-      { "Name": "First Level",
-        "path": "../levels/world2.data"
-      },
-      { "Name": "Second Level",
-        "path": "../levels/world.data"
-      },
-      { "Name": "Third Level",
-        "path": "../levels/world3.data"
-      }
-    ]
+{ "start": [
+      { "path": "../levels/world.data"}
+    ],
+  "transitional": [
+    { "path": "../levels/world2.data"},
+    { "path": "../levels/world3.data"}
+  ],
+  "end": [
+    { "path": "../levels/world.data"}
+  ]
 } 

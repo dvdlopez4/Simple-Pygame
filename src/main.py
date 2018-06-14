@@ -1,7 +1,6 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 
 from World import *
-# import cProfile
 
 
 def main():
@@ -12,4 +11,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # cProfile.run('main()')

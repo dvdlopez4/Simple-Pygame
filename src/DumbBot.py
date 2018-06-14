@@ -19,12 +19,17 @@ class DumbBot(object):
         Entity.velocity[0] = 100 * self.direction
         if Entity.isOnGround:
             Entity.velocity[1] = -250
-            self.direction = 1
-            if Entity.rect.x > self.players[0].rect.x:
-                self.direction = -1
+            if abs(Entity.rect.centerx - self.players[0].rect.centerx) <= 300 and abs(Entity.rect.centery - self.players[0].rect.centery) <= 75:
+                if Entity.rect.x > self.players[0].rect.x:
+                    self.direction = -1
+            else:
+                self.direction *= -1
+
 
         for player in self.players:
-            if Entity.rect.colliderect(player.rect):
-                player.health -= 10
-                time.sleep(0.25)
+            if Entity.rect.colliderect(player.rect) and not player.invincibility:
+                player.health -= 1
+                player.invincibility = 60
+                player.velocity[1] = -150
+                player.velocity[0] = 1600 * self.direction
                 break

@@ -31,10 +31,13 @@ class PlayerGraphics(object):
         rect = Entity.Animation[self.frameIndex].get_rect()
         rect.center = position.center
         rect.bottom = position.bottom
-        self.screen.blit(Entity.Animation[self.frameIndex], rect)
+        if Entity.velocity[0] < 0:
+            self.screen.blit(pygame.transform.flip(Entity.Animation[self.frameIndex], True, False), rect)
+        else:
+            self.screen.blit(Entity.Animation[self.frameIndex], rect)
         # pygame.draw.rect(self.screen, self.color, position, 2)
         if self.count <= 0:
-            self.count = 7
+            self.count = 9
             self.frameIndex += 1
         self.count -= 1
 

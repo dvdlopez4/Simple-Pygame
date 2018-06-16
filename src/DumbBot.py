@@ -13,6 +13,7 @@ class DumbBot(object):
         self.direction = 1
         self.players = world.players
         self.state = 0
+        self.hit = pygame.mixer.Sound("../assets/SFX_Hit03.ogg")
 
     def update(self, Entity):
 
@@ -32,4 +33,5 @@ class DumbBot(object):
                 player.invincibility = 60
                 player.velocity[1] = -150
                 player.velocity[0] = 1600 * self.direction
+                self.hit.play()
                 break

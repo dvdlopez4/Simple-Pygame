@@ -25,7 +25,8 @@ class World(object):
 
         os.environ["SDL_VIDEO_CENTERED"] = "1"
         pygame.init()
-
+        pygame.mixer.init()
+        
         pygame.display.set_caption("Simple Game")
         self.screen = pygame.display.set_mode((1280, 720))
         pygame.joystick.init()

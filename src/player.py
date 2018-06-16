@@ -16,6 +16,7 @@ class Player(Entity):
         self.canDash = True
         self.canJump = True
         self.invincibility = 0
+        self.jumpSound = pygame.mixer.Sound("../assets/SFX_Jump_10.wav")
         self.SpriteSheet = pygame.image.load('../assets/adventurer-Sheet.png').convert_alpha()
         self.running = []
         self.running.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((67,45,20,28))).copy())
@@ -31,12 +32,9 @@ class Player(Entity):
         self.idle.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((163,7,20,29))).copy())
         self.jumping = []
         self.jumping.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((117,81,19,27))).copy())
-        self.jumping.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((164,79,21,23))).copy())
-        self.jumping.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((218,82,15,20))).copy())
-        self.jumping.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((264,84,23,17))).copy())
-        self.jumping.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((320,84,18,20))).copy())
-        self.jumping.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((14,124,23,17))).copy())
-        self.jumping.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((68,112,17,31))).copy())
-        self.jumping.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((118,112,17,31))).copy())
+        self.falling = []
+        self.falling.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((118,112,17,31))).copy())
+        self.dashing = []
+        self.dashing.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((155,132,34,15))).copy())
 
         self.Animation = self.idle

@@ -30,7 +30,7 @@ class StandingState(object):
 
     def enter(self, Entity, Input):
         self.ButtonsReleased = Input.GetButtons()
-        Entity.Animation = Entity.idle
+        Entity.Animation = Entity.AnimationStates["idle"]
         Entity.canDash = True
         Entity.canJump = True
 
@@ -62,7 +62,7 @@ class RunningState(object):
         pass
 
     def enter(self, Entity, Input):
-        Entity.Animation = Entity.running
+        Entity.Animation = Entity.AnimationStates["running"]
         self.ButtonsReleased = Input.GetButtons()
 
 class DashState(object):
@@ -91,7 +91,7 @@ class DashState(object):
         pass
 
     def enter(self, Entity, Input):
-        Entity.Animation = Entity.dashing
+        Entity.Animation = Entity.AnimationStates["dashing"]
         if Entity.velocity[0] >= 0:
             self.velocity = [450,0]
         else:
@@ -114,7 +114,7 @@ class JumpState(object):
         if self.jumps > 0 and Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]]:
             Entity.isOnGround = True
             Entity.jumpSound.play()
-            Entity.Animation = Entity.jumping
+            Entity.Animation = Entity.AnimationStates["jumping"]
             self.jumps -= 1
 
         self.ButtonsReleased = Input.GetButtons()
@@ -128,7 +128,7 @@ class JumpState(object):
             Entity.velocity[1] = -350
 
         if Entity.velocity[1] > 0:
-            Entity.Animation = Entity.falling
+            Entity.Animation = Entity.AnimationStates["falling"]
 
 
 
@@ -136,7 +136,7 @@ class JumpState(object):
         pass
 
     def enter(self, Entity, Input):
-        Entity.Animation = Entity.jumping
+        Entity.Animation = Entity.AnimationStates["jumping"]
         self.ButtonsReleased = Input.GetButtons()
 
 

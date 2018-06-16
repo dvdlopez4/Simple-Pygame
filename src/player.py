@@ -2,7 +2,6 @@ from entity import *
 from DamageBlock import *
 
 class Player(Entity):
-    """docstring for Player"""
     def __init__(self, _input, _physics, _graphics):
         super(Player, self).__init__(_input, _physics, _graphics)
         self.rect.center = 0, 0
@@ -18,23 +17,41 @@ class Player(Entity):
         self.invincibility = 0
         self.jumpSound = pygame.mixer.Sound("../assets/SFX_Jump_10.wav")
         self.SpriteSheet = pygame.image.load('../assets/adventurer-Sheet.png').convert_alpha()
-        self.running = []
-        self.running.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((67,45,20,28))).copy())
-        self.running.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((116,46,20,27))).copy())
-        self.running.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((166,48,20,25))).copy())
-        self.running.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((217,45,23,28))).copy())
-        self.running.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((266,46,20,27))).copy())
-        self.running.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((316,48,20,25))).copy())
-        self.idle = []
-        self.idle.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((14,7,19,29))).copy())
-        self.idle.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((66,6,17,30))).copy())
-        self.idle.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((115,6,19,30))).copy())
-        self.idle.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((163,7,20,29))).copy())
-        self.jumping = []
-        self.jumping.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((117,81,19,27))).copy())
-        self.falling = []
-        self.falling.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((118,112,17,31))).copy())
-        self.dashing = []
-        self.dashing.append(pygame.transform.scale2x(self.SpriteSheet.subsurface((155,132,34,15))).copy())
 
-        self.Animation = self.idle
+        self.AnimationStates = {}
+        self.initializeAnimations()
+
+        self.Animation = self.AnimationStates["idle"]
+
+    def initializeAnimations(self):
+
+        runningFrames = [
+            (67,45,20,28),
+            (116,46,20,27),
+            (166,48,20,25),
+            (217,45,23,28),
+            (266,46,20,27),
+            (316,48,20,25)
+        ]
+
+        idleFrames = [
+            (14,7,19,29),
+            (66,6,17,30),
+            (115,6,19,30),
+            (163,7,20,29)
+        ]
+
+        jumpingFrames = [(117,81,19,27)]
+        fallingFrames = [(118,112,17,31)]
+        dashingFrames = [(155,132,34,15)]
+
+        self.setAnimation("idle", idleFrames)
+        self.setAnimation("running", runningFrames)
+        self.setAnimation("jumping", jumpingFrames)
+        self.setAnimation("falling", fallingFrames)
+        self.setAnimation("dashing", dashingFrames)
+
+    def setAnimation(self, key, frames):
+        self.AnimationStates[key] = []
+        for frame in frames:
+            self.AnimationStates[key].append(pygame.transform.scale2x(self.SpriteSheet.subsurface(frame)).copy())

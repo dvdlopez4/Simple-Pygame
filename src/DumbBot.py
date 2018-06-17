@@ -20,7 +20,7 @@ class DumbBot(object):
         Entity.velocity[0] = 100 * self.direction
         if Entity.isOnGround:
             Entity.velocity[1] = -250
-            if abs(Entity.rect.centerx - self.players[0].rect.centerx) <= 300 and abs(Entity.rect.centery - self.players[0].rect.centery) <= 75:
+            if len(self.players) and abs(Entity.rect.centerx - self.players[0].rect.centerx) <= 300 and abs(Entity.rect.centery - self.players[0].rect.centery) <= 75:
                 if Entity.rect.x > self.players[0].rect.x:
                     self.direction = -1
             else:

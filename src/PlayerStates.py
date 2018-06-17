@@ -11,11 +11,14 @@ class StandingState(object):
         if Input.Buttons[Input.Actions["Right"]] or Input.Buttons[Input.Actions["Left"]]:
             return RunningState()
 
-        if Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]] or not Entity.isOnGround:
+        if (Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]]) or not Entity.isOnGround:
             return JumpState()
 
         if Input.Buttons[Input.Actions["Dash"]] and not self.ButtonsReleased[Input.Actions["Dash"]]:
             return DashState()
+
+        if Input.Buttons[Input.Actions["Attack"]] and not self.ButtonsReleased[Input.Actions["Attack"]]:
+            return AttackState()
 
 
         self.ButtonsReleased = Input.GetButtons()
@@ -50,8 +53,16 @@ class RunningState(object):
         if Input.Buttons[Input.Actions["Dash"]] and not self.ButtonsReleased[Input.Actions["Dash"]]:
             return DashState()
 
-        if Input.Buttons[Input.Actions["Left"]]: Entity.velocity[0] = -150
-        if Input.Buttons[Input.Actions["Right"]]: Entity.velocity[0] = 150
+        if Input.Buttons[Input.Actions["Left"]]: 
+            Entity.velocity[0] = -150
+            Entity.isFacingRight = False
+        if Input.Buttons[Input.Actions["Right"]]: 
+            Entity.velocity[0] = 150
+            Entity.isFacingRight = True
+
+        if Input.Buttons[Input.Actions["Attack"]] and not self.ButtonsReleased[Input.Actions["Attack"]]:
+            return AttackState()
+
         self.ButtonsReleased = Input.GetButtons()
         return None
 
@@ -92,7 +103,7 @@ class DashState(object):
 
     def enter(self, Entity, Input):
         Entity.Animation = Entity.AnimationStates["dashing"]
-        if Entity.velocity[0] >= 0:
+        if Entity.isFacingRight:
             self.velocity = [450,0]
         else:
             self.velocity = [-450,0]
@@ -103,8 +114,12 @@ class JumpState(object):
         self.jumps = jumps
 
     def handleInput(self, Entity, Input):
-        if Input.Buttons[Input.Actions["Left"]]: Entity.velocity[0] = -150
-        if Input.Buttons[Input.Actions["Right"]]: Entity.velocity[0] = 150
+        if Input.Buttons[Input.Actions["Left"]]:
+            Entity.isFacingRight = False
+            Entity.velocity[0] = -150
+        if Input.Buttons[Input.Actions["Right"]]:
+            Entity.isFacingRight = True
+            Entity.velocity[0] = 150
         if Entity.isOnGround:
             return StandingState()
 
@@ -139,4 +154,30 @@ class JumpState(object):
         Entity.Animation = Entity.AnimationStates["jumping"]
         self.ButtonsReleased = Input.GetButtons()
 
+class AttackState(object):
+    def __init__(self):
+        self.ButtonsReleased = np.zeros((20,), dtype=int)
 
+    def handleInput(self, Entity, Input):
+        if Entity.frameIndex == len(Entity.AnimationStates) - 1:
+            return StandingState()
+
+        return None
+
+    def update(self, Entity):
+        Entity.canHurt = False
+        Entity.invincibility = 1
+        if Entity.frameIndex == len(Entity.AnimationStates) - 3:
+            Entity.canHurt = True
+        if Entity.frameIndex == len(Entity.AnimationStates) - 3:
+            Entity.velocity[0] = 50
+            if not Entity.isFacingRight:
+                Entity.velocity[0] = -50
+            # print("Damaging")
+
+    def exit(self, Entity, Input):
+        Entity.invincibility = 0
+
+    def enter(self, Entity, Input):
+        Entity.Animation = Entity.AnimationStates["attacking"]
+        Entity.frameIndex = 0

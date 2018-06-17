@@ -7,44 +7,42 @@ from DamageBlock import *
 
 class GamePadInput(object):
 
-    def __init__(self, world):
+    def __init__(self, joystick):
         self.state_ = StandingState()
-        self.joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
-        self.joysticks[0].init()
+        self.joystick = joystick
 
         self.Actions = {
             'Right': 7,
             'Left': 6,
             'Jump': 1,
             'Dash': 5,
+            'Attack': 2
         }
         self.Buttons = []
-        self.PreviousButtons = np.zeros((self.joysticks[0].get_numbuttons(),), dtype=int)
 
     def GetButtons(self):
         buttons = []
-        for button in range(self.joysticks[0].get_numbuttons()):
-            buttons.append(self.joysticks[0].get_button(button))
+        for button in range(self.joystick.get_numbuttons()):
+            buttons.append(self.joystick.get_button(button))
         return buttons
 
 
     def update(self, Entity):
         self.Buttons = self.GetButtons()
 
-        if self.Buttons[self.Actions["Left"]]: Entity.velocity[0] = -150
-        if self.Buttons[self.Actions["Right"]]: Entity.velocity[0] = 150
+        if Entity.invincibility:
+            Entity.invincibility -= 1
+        if Entity.invincibility <= 45:
+            if self.joystick.get_axis(0) < -0.25:
+                self.Buttons[self.Actions["Left"]] = True
 
+            if self.joystick.get_axis(0) > 0.25:
+                self.Buttons[self.Actions["Right"]] = True
 
-        if self.joysticks[0].get_axis(0) < -0.25:
-            Entity.velocity[0] = -150
+            Entity.state = self.state_.handleInput(Entity, self)
+            if Entity.state != None:
+                self.state_.exit(Entity, self)
+                self.state_ = Entity.state
+                self.state_.enter(Entity, self)
 
-        if self.joysticks[0].get_axis(0) > 0.25:
-            Entity.velocity[0] = 150
-
-        Entity.state = self.state_.handleInput(Entity, self)
-        if Entity.state != None:
-            self.state_.exit(Entity, self)
-            self.state_ = Entity.state
-            self.state_.enter(Entity, self)
-
-        self.state_.update(Entity)
+            self.state_.update(Entity)

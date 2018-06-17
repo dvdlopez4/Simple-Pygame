@@ -17,8 +17,7 @@ class PlayerGraphics(object):
     def __init__(self, screen):
         self.screen = screen
         self.color = (255,150,255)
-        self.frameIndex = 0
-        self.count = 10
+        self.count = 5
 
     def update(self, Entity, camera):
         if Entity.invincibility:
@@ -26,19 +25,19 @@ class PlayerGraphics(object):
         else:
             self.color = (255,150,255)
         position = camera.apply(Entity)
-        if self.frameIndex > len(Entity.Animation) - 1:
-            self.frameIndex = 0
-        rect = Entity.Animation[self.frameIndex].get_rect()
+        if Entity.frameIndex > len(Entity.Animation) - 1:
+            Entity.frameIndex = 0
+        rect = Entity.Animation[Entity.frameIndex].get_rect()
         rect.center = position.center
         rect.bottom = position.bottom
-        if Entity.velocity[0] < 0:
-            self.screen.blit(pygame.transform.flip(Entity.Animation[self.frameIndex], True, False), rect)
+        if not Entity.isFacingRight:
+            self.screen.blit(pygame.transform.flip(Entity.Animation[Entity.frameIndex], True, False), rect)
         else:
-            self.screen.blit(Entity.Animation[self.frameIndex], rect)
+            self.screen.blit(Entity.Animation[Entity.frameIndex], rect)
         # pygame.draw.rect(self.screen, self.color, position, 2)
         if self.count <= 0:
-            self.count = 9
-            self.frameIndex += 1
+            self.count = 5
+            Entity.frameIndex += 1
         self.count -= 1
 
 

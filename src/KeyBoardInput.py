@@ -10,7 +10,8 @@ class KeyBoardInput(object):
             'Right': pygame.K_d, 
             'Left': pygame.K_a,
             'Jump': pygame.K_SPACE,
-            'Dash': pygame.K_v
+            'Dash': pygame.K_v,
+            'Attack': pygame.K_f
         }
         self.Buttons = None
         self.GetButtons = pygame.key.get_pressed

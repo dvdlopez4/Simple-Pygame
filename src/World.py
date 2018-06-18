@@ -216,7 +216,6 @@ class World(object):
             for player in self.players:
                 if player.rect.y > 1320 or player.health <= 0:
                     self.players.remove(player)
-                    self.entities.remove(player)
 
 
             if not len(self.players):
@@ -231,7 +230,7 @@ class World(object):
     def input(self):
         for e in self.entities:
             e.handleInput()
-            if e.health < 0:
+            if e.health <= 0:
                 self.explosionRect = e.rect
                 self.entities.remove(e)
                 self.particles.append(self.explosionFrames)

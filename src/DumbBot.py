@@ -33,5 +33,6 @@ class DumbBot(object):
                 player.invincibility = 60
                 player.velocity[1] = -150
                 player.velocity[0] = 1600 * self.direction
+                player.frameIndex = len(player.Animation) - 1
                 self.hit.play()
                 break

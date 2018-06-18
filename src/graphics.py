@@ -34,7 +34,8 @@ class PlayerGraphics(object):
             self.screen.blit(pygame.transform.flip(Entity.Animation[Entity.frameIndex], True, False), rect)
         else:
             self.screen.blit(Entity.Animation[Entity.frameIndex], rect)
-        # pygame.draw.rect(self.screen, self.color, position, 2)
+        if Entity.invincibility:
+            pygame.draw.rect(self.screen, self.color, position, 2)
         if self.count <= 0:
             self.count = 5
             Entity.frameIndex += 1

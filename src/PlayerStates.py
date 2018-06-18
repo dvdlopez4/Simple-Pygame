@@ -8,6 +8,9 @@ class StandingState(object):
         self.ButtonsReleased = np.zeros((200,), dtype=int)
 
     def handleInput(self, Entity, Input):
+
+        if Input.Buttons[Input.Actions["Attack"]] and not self.ButtonsReleased[Input.Actions["Attack"]]:
+            return AttackState()
         if Input.Buttons[Input.Actions["Right"]] or Input.Buttons[Input.Actions["Left"]]:
             return RunningState()
 
@@ -17,8 +20,6 @@ class StandingState(object):
         if Input.Buttons[Input.Actions["Dash"]] and not self.ButtonsReleased[Input.Actions["Dash"]]:
             return DashState()
 
-        if Input.Buttons[Input.Actions["Attack"]] and not self.ButtonsReleased[Input.Actions["Attack"]]:
-            return AttackState()
 
 
         self.ButtonsReleased = Input.GetButtons()
@@ -44,6 +45,8 @@ class RunningState(object):
 
     def handleInput(self, Entity, Input):
 
+        if Input.Buttons[Input.Actions["Attack"]] and not self.ButtonsReleased[Input.Actions["Attack"]]:
+            return AttackState()
         if (not Input.Buttons[Input.Actions["Left"]] and not Input.Buttons[Input.Actions["Right"]]) and Entity.isOnGround:
             return StandingState()
 
@@ -60,8 +63,6 @@ class RunningState(object):
             Entity.velocity[0] = 150
             Entity.isFacingRight = True
 
-        if Input.Buttons[Input.Actions["Attack"]] and not self.ButtonsReleased[Input.Actions["Attack"]]:
-            return AttackState()
 
         self.ButtonsReleased = Input.GetButtons()
         return None
@@ -78,7 +79,7 @@ class RunningState(object):
 
 class DashState(object):
     def __init__(self):
-        self.DashFrames = 10
+        self.DashFrames = 15
         self.velocity = [450,0]
 
     def handleInput(self, Entity, Input):
@@ -166,7 +167,8 @@ class AttackState(object):
 
     def update(self, Entity):
         Entity.canHurt = False
-        Entity.invincibility = 1
+        if Entity.frameIndex > len(Entity.AnimationStates) - 4:
+            Entity.invincibility = 1
         if Entity.frameIndex == len(Entity.AnimationStates) - 3:
             Entity.canHurt = True
         if Entity.frameIndex == len(Entity.AnimationStates) - 3:
@@ -180,4 +182,5 @@ class AttackState(object):
 
     def enter(self, Entity, Input):
         Entity.Animation = Entity.AnimationStates["attacking"]
+        Entity.slashSound.play()
         Entity.frameIndex = 0

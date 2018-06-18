@@ -15,6 +15,7 @@ class Player(Entity):
         self.canJump = True
         self.invincibility = 0
         self.jumpSound = pygame.mixer.Sound("../assets/SFX_Jump_10.wav")
+        self.slashSound = pygame.mixer.Sound("../assets/SFX_Slash05.ogg")
         self.SpriteSheet = pygame.image.load('../assets/adventurer-Sheet.png').convert_alpha()
         self.isFacingRight = True
         self.hurtRect = pygame.Rect(self.rect)
@@ -88,4 +89,5 @@ class Player(Entity):
                     if not self.isFacingRight:
                         entity.velocity[0] = -2000
                     entity.velocity[1] = -150
+                    print(entity.health)
                     break

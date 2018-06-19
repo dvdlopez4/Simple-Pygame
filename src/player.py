@@ -89,5 +89,4 @@ class Player(Entity):
                     if not self.isFacingRight:
                         entity.velocity[0] = -2000
                     entity.velocity[1] = -150
-                    print(entity.health)
                     break

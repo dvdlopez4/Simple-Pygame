@@ -23,6 +23,6 @@ class Camera(object):
             targetx = max(-self.width + 641,  targetx)
             targety = max(-self.height + 85, targety)
             self.camera.x += (targetx - self.camera.x) * 0.025
-            self.camera.y += (targety - self.camera.y) * 0.085
+            self.camera.y += (targety - self.camera.y) * 0.125
 
         # self.camera = pygame.Rect(x,y,self.width, self.height)

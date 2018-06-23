@@ -25,6 +25,7 @@ class KeyBoardInput(object):
 
             Entity.state = self.state_.handleInput(Entity, self)
             if Entity.state != None:
+                self.state_.exit(Entity, self)
                 self.state_ = Entity.state
                 self.state_.enter(Entity, self)
 

@@ -1,5 +1,6 @@
 from entity import *
-from DamageBlock import *
+from Particle import *
+from graphics import *
 
 class Player(Entity):
     def __init__(self, _input, _physics, _graphics):
@@ -26,6 +27,7 @@ class Player(Entity):
         self.initializeAnimations()
 
         self.Animation = self.AnimationStates["idle"]
+        self.hits = {}
 
     def initializeAnimations(self):
 
@@ -73,20 +75,30 @@ class Player(Entity):
             self.AnimationStates[key].append(pygame.transform.scale2x(self.SpriteSheet.subsurface(frame)).copy())
 
     def renew(self, world):
-        if self.isFacingRight:
-            self.hurtRect.centerx = self.rect.centerx + 23
-        else:
-            self.hurtRect.centerx = self.rect.centerx - 23
-        self.hurtRect.centery = self.rect.centery - 14
-        self.hurtRect.w = 38
-        self.hurtRect.h = 40
 
         if self.canHurt:
+            if self.isFacingRight:
+                self.hurtRect.centerx = self.rect.centerx + 30
+            else:
+                self.hurtRect.centerx = self.rect.centerx - 30
+            self.hurtRect.centery = self.rect.centery - 14
+            self.hurtRect.w = 30
+            self.hurtRect.h = 10
             for entity in world.entities:
-                if entity != self and self.hurtRect.colliderect(entity.rect):
+                if entity != self and self.hurtRect.colliderect(entity.rect) and not self.hits[entity]:
+                    self.hits[entity] = True
                     entity.health -= 1
+                    entity.rect.left = self.hurtRect.right
                     entity.velocity[0] = 2000
                     if not self.isFacingRight:
+                        entity.rect.right = self.hurtRect.left
                         entity.velocity[0] = -2000
                     entity.velocity[1] = -150
-                    break
+                    particle = Particle(None, None, ExplosionGraphics(world.screen, world.explosion))
+                    rect = world.explosion.get_rect()
+                    particle.rect.center = self.rect.centerx - 15, self.rect.centery - 50
+                    world.particles.append(particle)
+        else:
+            for entity in world.entities:
+                self.hits[entity] = False
+

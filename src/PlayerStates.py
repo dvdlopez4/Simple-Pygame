@@ -83,7 +83,8 @@ class DashState(object):
         self.velocity = [450,0]
 
     def handleInput(self, Entity, Input):
-
+        if Input.Buttons[Input.Actions["Attack"]]:
+            return AttackState()
         if Entity.invincibility:
             self.DashFrames = 0
         if self.DashFrames <= 0:
@@ -115,6 +116,8 @@ class JumpState(object):
         self.jumps = jumps
 
     def handleInput(self, Entity, Input):
+        if Input.Buttons[Input.Actions["Attack"]] and not self.ButtonsReleased[Input.Actions["Attack"]]:
+            return AttackState()
         if Input.Buttons[Input.Actions["Left"]]:
             Entity.isFacingRight = False
             Entity.velocity[0] = -150
@@ -166,18 +169,15 @@ class AttackState(object):
         return None
 
     def update(self, Entity):
-        Entity.canHurt = False
-        if Entity.frameIndex > len(Entity.AnimationStates) - 4:
-            Entity.invincibility = 1
+        Entity.invincibility = 1
         if Entity.frameIndex == len(Entity.AnimationStates) - 3:
             Entity.canHurt = True
-        if Entity.frameIndex == len(Entity.AnimationStates) - 3:
             Entity.velocity[0] = 50
             if not Entity.isFacingRight:
                 Entity.velocity[0] = -50
-            # print("Damaging")
 
     def exit(self, Entity, Input):
+        Entity.canHurt = False
         Entity.invincibility = 0
 
     def enter(self, Entity, Input):

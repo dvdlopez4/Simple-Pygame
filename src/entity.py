@@ -1,11 +1,11 @@
-import pygame as pg
+import pygame
 
 class Entity(object):
     def __init__(self, _input, _physics, _graphics):
         self.input = _input
         self.physics = _physics
         self.graphics = _graphics
-        self.rect = pg.Rect(0,0,0,0)
+        self.rect = pygame.Rect(0,0,0,0)
         self.velocity = [0,0]
         self.acceleration = [0,980]
         self.mass = 0.25

@@ -13,6 +13,7 @@ from KeyBoardInput import *
 from GamePadInput import *
 from pygame.locals import *
 from Camera import *
+from Particle import *
 import random
 
 class World(object):
@@ -36,78 +37,14 @@ class World(object):
         for stick in self.joysticks:
             stick.init()
 
-        self.explosion = pygame.image.load('../assets/spritesheet.png').convert_alpha()
-        self.explosionFrames = []
-        self.explosionFrames.append(self.explosion.subsurface((0, 0, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((100, 0, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((200, 0, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((300, 0, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((400, 0, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((500, 0, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((600, 0, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((700, 0, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((800, 0, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((900, 0, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((0, 100, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((100, 100, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((200, 100, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((300, 100, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((400, 100, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((500, 100, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((600, 100, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((700, 100, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((800, 100, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((900, 100, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((0, 200, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((100, 200, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((200, 200, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((300, 200, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((400, 200, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((500, 200, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((600, 200, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((700, 200, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((800, 200, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((900, 200, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((0, 300, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((100, 300, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((200, 300, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((300, 300, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((400, 300, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((500, 300, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((600, 300, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((700, 300, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((800, 300, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((900, 300, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((0, 400, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((100, 400, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((200, 400, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((300, 400, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((400, 400, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((500, 400, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((600, 400, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((700, 400, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((800, 400, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((900, 400, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((0, 500, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((100, 500, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((200, 500, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((300, 500, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((400, 500, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((500, 500, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((600, 500, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((700, 500, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((800, 500, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((900, 500, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((0, 600, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((100, 600, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((200, 600, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((300, 600, 100, 100)).copy())
-        self.explosionFrames.append(self.explosion.subsurface((400, 600, 100, 100)).copy())
-        self.frameIndex = 0
-        self.explosionRect = None
 
         self.loadAssets()
+        player = Player(KeyBoardInput(), PhysicsComponent(self), PlayerGraphics(self.screen))
+        self.addEntity(player)
+        for player in self.players:
+            player.rect.center = self.start
         self.camera = Camera(760, 720)
+
 
     def createLevel(self, x, y):
         placementx = x
@@ -149,7 +86,6 @@ class World(object):
         self.CurrentLevel = f.readlines()
         f.close()
         self.entities.clear()
-        self.players.clear()
         self.platforms.clear()
         self.platforms.append(Wall(None, None, GraphicsComponent(self.screen, None),0,0,1320,40))
         self.platforms.append(Wall(None, None, GraphicsComponent(self.screen, None),0,0,40,1320))
@@ -163,9 +99,6 @@ class World(object):
                 f.close()
                 self.createLevel(40 * (1 + 8 * x), 40 * (1 + 8 *y))
 
-        player = Player(GamePadInput(self.joysticks[0]), PhysicsComponent(self), PlayerGraphics(self.screen))
-        player.rect.center = self.start
-        self.addEntity(player)
 
     def loadAssets(self):
         f = open("data.json", "r")
@@ -173,6 +106,7 @@ class World(object):
         f.close()
 
         self.loadLevel()
+        self.explosion = pygame.image.load('../assets/spritesheet.png').convert_alpha()
         rawImage = pygame.image.load('../assets/game_background_4.png').convert()
         self.image = pygame.transform.scale(rawImage, (1280, 720))
 
@@ -197,21 +131,32 @@ class World(object):
                 if e.type == pygame.KEYDOWN and e.key == pygame.K_RETURN:
                     if GameOver:
                         self.loadLevel()
-                        self.players[0].rect.center = self.start
+                        player = Player(KeyBoardInput(), PhysicsComponent(self), PlayerGraphics(self.screen))
+                        player.rect.center = self.start
+                        self.addEntity(player)
                         GameOver = False
 
 
             if len(self.players) and self.end.check(self.players[0]):
                 self.loadLevel()
-                self.players[0].rect.center = self.start
+                for player in self.players:
+                    player.rect.center = self.start
+                    self.entities.append(player)
 
 
 
             if not paused:
+                if pygame.mixer.get_busy():
+                    pygame.mixer.unpause()
+                for particle in self.particles:
+                    if particle.isDone:
+                        self.particles.remove(particle)
                 self.input()
                 self.physics(time)
-            self.camera.update(self.players)
-            self.render()
+                self.camera.update(self.players)
+                self.render()
+            else:
+                pygame.mixer.pause()
 
             for player in self.players:
                 if player.rect.y > 1320 or player.health <= 0:
@@ -231,10 +176,11 @@ class World(object):
         for e in self.entities:
             e.handleInput()
             if e.health <= 0:
-                self.explosionRect = e.rect
+                explosion = Particle(None, None, ExplosionGraphics(self.screen, self.explosion))
+                explosion.rect = e.rect
+                explosion.centerx = e.rect.centerx - 100
                 self.entities.remove(e)
-                self.particles.append(self.explosionFrames)
-                self.frameIndex = 0
+                self.particles.append(explosion)
         for player in self.players:
             player.renew(self)
 
@@ -251,11 +197,8 @@ class World(object):
         for platform in self.platforms:
             platform.render(self.camera)
         for particles in self.particles:
-            self.explosionRect.size = particles[self.frameIndex].get_rect().size
-            self.screen.blit(particles[self.frameIndex], self.explosionRect.move(self.camera.camera.topleft))
-            self.frameIndex += 1
-            if self.frameIndex == len(particles) - 1:
-                self.particles.remove(particles)
+            particles.render(self.camera)
+
 
         if len(self.players):
             for hitpoint in range(self.players[0].maxHealth):

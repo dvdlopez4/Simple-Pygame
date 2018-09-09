@@ -16,6 +16,70 @@ from Camera import *
 from Particle import *
 import random
 
+
+class Level(object):
+    def __init__(self, shape):
+        self.Layout = np.zeros(shape, dtype=int).tolist()
+
+    def getDirection(self, room, size):
+        if room == 0: direction = 1
+        elif room == size: direction = -1
+        else: direction = pow(-1,random.randint(0,1))
+
+        return direction
+
+    def createPath(self):
+        (ChooseStartState, AdjacentRoomState, NextFloorState) = (1,2,3)
+        size = len(self.Layout[0]) - 1
+        if not size: return 0
+        height = len(self.Layout) - 1
+        room = 0
+        state = ChooseStartState
+        floor = 0
+        direction = 0
+        done = False
+        floorChance = 0.6
+        while not done:
+            roomType = "hall"
+            if state == ChooseStartState:
+                room = random.randint(0, size)
+                direction = self.getDirection(room, size)
+                state = AdjacentRoomState
+                roomType = "start"
+            elif state == AdjacentRoomState:
+                room += direction
+                if direction != 0 and ((room == 0 or room == size) or random.random() < floorChance):
+                    state = NextFloorState
+                    roomType = "drop"
+                    floorChance -= 0.2
+                    if floor == height: 
+                        done = True
+                        roomType = "end"
+            elif state == NextFloorState:
+                floor += 1
+                direction = self.getDirection(room, size)
+                state = AdjacentRoomState
+
+            print("floor", type(floor))
+            print("room", type(room))
+            self.Layout[floor][int(room)] = roomType
+    
+    def generateLines(self, rooms):
+        mapLines = []
+        for floor in self.Layout:
+            lines = np.zeros(len(rooms[0][0])).tolist()
+            lines = list(map(lambda x: "w", lines))
+
+            for room in floor:
+                select = random.randint(0, len(rooms[room]) - 1)
+                for index, line in enumerate(lines):
+                    lines[index] += (rooms[room])[select][index]
+
+            for line in lines:
+                mapLines.append(line + "w")
+
+        return mapLines
+
 class World(object):
     def __init__(self):
         self.entities = []
@@ -47,8 +111,7 @@ class World(object):
 
 
     def createLevel(self, x, y):
-        placementx = x
-        placementy = y
+
         square = 40
         rawImage = pygame.image.load('../assets/platform.png').convert()
         enemyImage = pygame.image.load('../assets/enemy.png').convert_alpha()
@@ -56,48 +119,54 @@ class World(object):
         currentY = 0
         wallCount = 0
         for row in self.CurrentLevel:
+            print(row)
             for char in row:
-                isWall = False
                 if char == 'w':
-                    isWall = True
-                    wallCount += 1
-                    if not currentX and not currentY:
-                        currentX = placementx
-                        currentY = placementy
+                    self.platforms.append(Wall(None, None, GraphicsComponent(self.screen, None),x,y,square,square))
                 if char == 'e':
-                    self.end = EndBlock(placementx, placementy, square, square)
+                    self.end = EndBlock(x, y, square, square)
                     self.end.graphics = EndGraphics(self.screen)
                     self.addEntity(self.end)
                 if char == 's':
-                    self.start = placementx, placementy
+                    self.start = x, y
                 if char == 'b':
                     bot = Bot(DumbBot(self), PhysicsComponent(self), GraphicsComponent(self.screen, enemyImage))
-                    bot.rect.center = placementx, placementy
+                    bot.rect.center = x, y
                     self.addEntity(bot)
-                if (currentX or currentY) and not isWall:
-                    self.platforms.append(Wall(None, None, GraphicsComponent(self.screen, None),currentX,currentY,square * wallCount,square))
-                    currentX = currentY = wallCount = 0
-                placementx += square
-            placementy += square
-            placementx = x
+                x += square
+            y += square
+            x = square
 
     def loadLevel(self):
-        f = open(self.data["start"][random.randint(0, len(self.data["start"]) - 1)]["path"], "r")
-        self.CurrentLevel = f.readlines()
-        f.close()
+
+        lvl = Level((6,6))
+        lvl.createPath()
+
+        rooms = {
+            "hall": [
+                ["     ", "     ", " w   ", "wwwww"],
+                ["  w  ", "     ", "w    ", "wwwww"],
+                ["     ", "     ", "w    ", "wwwww"],
+                ["     ", "w    ", "ww   ", "wwwww"],
+                ["w   w", "w   w", "     ", "wwwww"],
+            ],
+            "drop": [["     ", "     ", "     ", "     "]],
+            0: [
+                ["wwwww", "wwwww", "wwwww", "wwwww"],
+                ["    w", "w   w", "  www", "     "],
+                ["ww  w", "w  w ", " w ww", "     "],
+            ],
+            "start": [["     ", " ^   ", "(s)  ", "wwwww"]],
+            "end": [["     ", " ^   ", "(e)  ", "wwwww"]]
+        }
+        level = lvl.generateLines(rooms)
+        
+        self.CurrentLevel = level
         self.entities.clear()
         self.platforms.clear()
         self.platforms.append(Wall(None, None, GraphicsComponent(self.screen, None),0,0,1320,40))
-        self.platforms.append(Wall(None, None, GraphicsComponent(self.screen, None),0,0,40,1320))
-        self.platforms.append(Wall(None, None, GraphicsComponent(self.screen, None),1320,0,40,1320))
 
         self.createLevel(40, 40)
-        for y in range(0,4):
-            for x in range(0,4):
-                f = open(self.data["transitional"][random.randint(0, len(self.data["transitional"]) - 1)]["path"], "r")
-                self.CurrentLevel = f.readlines()
-                f.close()
-                self.createLevel(40 * (1 + 8 * x), 40 * (1 + 8 *y))
 
 
     def loadAssets(self):

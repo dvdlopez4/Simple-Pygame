@@ -34,6 +34,7 @@ class PlayerGraphics(object):
             self.screen.blit(pygame.transform.flip(Entity.Animation[Entity.frameIndex], True, False), rect)
         else:
             self.screen.blit(Entity.Animation[Entity.frameIndex], rect)
+        pygame.draw.rect(self.screen, (255, 0, 0), camera.apply(Entity), 2)
         if self.count <= 0:
             self.count = 5
             Entity.frameIndex += 1

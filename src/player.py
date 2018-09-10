@@ -7,7 +7,7 @@ class Player(Entity):
         super(Player, self).__init__(_input, _physics, _graphics)
         self.rect.center = 0, 0
         self.rect.w = 20
-        self.rect.h = 35
+        self.rect.h = 45
         self.mass = 1
         self.ID = -1
         self.health = self.maxHealth = 3

@@ -101,10 +101,11 @@ class DashState(object):
         Entity.velocity[1] = self.velocity[1]
 
     def exit(self, Entity, Input):
-        pass
+        Entity.rect.h = 45
 
     def enter(self, Entity, Input):
         Entity.Animation = Entity.AnimationStates["dashing"]
+        Entity.rect.h = 25
         if Entity.isFacingRight:
             self.velocity = [450,0]
         else:
@@ -144,7 +145,7 @@ class JumpState(object):
     def update(self, Entity):
         if Entity.isOnGround:
             Entity.jumpSound.play()
-            Entity.velocity[1] = -350
+            Entity.velocity[1] = -450
 
         if Entity.velocity[1] > 0:
             Entity.Animation = Entity.AnimationStates["falling"]

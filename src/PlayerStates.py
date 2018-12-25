@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+import random
 
 
 class StandingState(object):
@@ -90,6 +91,8 @@ class DashState(object):
         if self.DashFrames <= 0:
             Entity.canDash = False
             if Entity.isOnGround:
+                if Input.Buttons[Input.Actions["Right"]] or Input.Buttons[Input.Actions["Left"]]:
+                    return RunningState()
                 return StandingState()
             else:
                 return JumpState()
@@ -105,6 +108,7 @@ class DashState(object):
 
     def enter(self, Entity, Input):
         Entity.Animation = Entity.AnimationStates["dashing"]
+        # Entity.rect.centery += 15
         Entity.rect.h = 25
         if Entity.isFacingRight:
             self.velocity = [450,0]
@@ -133,7 +137,7 @@ class JumpState(object):
 
         if self.jumps > 0 and Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]]:
             Entity.isOnGround = True
-            Entity.jumpSound.play()
+            Entity.jumpSound[random.randint(0,1)].play()
             Entity.Animation = Entity.AnimationStates["jumping"]
             self.jumps -= 1
 
@@ -144,7 +148,7 @@ class JumpState(object):
 
     def update(self, Entity):
         if Entity.isOnGround:
-            Entity.jumpSound.play()
+            Entity.jumpSound[random.randint(0,1)].play()
             Entity.velocity[1] = -450
 
         if Entity.velocity[1] > 0:
@@ -171,6 +175,7 @@ class AttackState(object):
 
     def update(self, Entity):
         Entity.invincibility = 1
+        Entity.velocity[1] = 0
         if Entity.frameIndex == len(Entity.AnimationStates) - 3:
             Entity.canHurt = True
             Entity.velocity[0] = 50

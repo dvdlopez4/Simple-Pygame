@@ -5,7 +5,7 @@ from math import *
 from physics import *
 from graphics import *
 from entity import *
-
+import random
 
 
 class DumbBot(object):
@@ -13,14 +13,21 @@ class DumbBot(object):
         self.direction = 1
         self.players = world.players
         self.state = 0
-        self.hit = pygame.mixer.Sound("../assets/SFX_Hit03.ogg")
+        self.hit = pygame.mixer.Sound("../assets/Hit.wav")
+        self.garbage = [
+            pygame.mixer.Sound("../assets/Enemy1.wav"),
+            pygame.mixer.Sound("../assets/Enemy2.wav"),
+            pygame.mixer.Sound("../assets/Enemy3.wav"),
+            pygame.mixer.Sound("../assets/Enemy4.wav")
+        ]
 
     def update(self, Entity):
 
         Entity.velocity[0] = 100 * self.direction
         if Entity.isOnGround:
-            # Entity.velocity[1] = -250
+            Entity.velocity[1] = -250
             if len(self.players) and abs(Entity.rect.centerx - self.players[0].rect.centerx) <= 300 and abs(Entity.rect.centery - self.players[0].rect.centery) <= 75:
+                self.garbage[random.randint(0,3)].play()
                 difference = Entity.rect.x - self.players[0].rect.x
                 if difference == 0:
                     difference = 1

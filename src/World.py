@@ -89,8 +89,10 @@ class World(object):
         self.MS_PER_UPDATE = 16
 
         os.environ["SDL_VIDEO_CENTERED"] = "1"
-        pygame.init()
+        pygame.mixer.pre_init(44100, -16, 1, 512)
         pygame.mixer.init()
+        pygame.init()
+
         self.myfont = pygame.font.SysFont("monospace", 34, bold=True)
         self.score = 0
         pygame.display.set_caption("Simple Game")
@@ -106,7 +108,7 @@ class World(object):
         self.addEntity(player)
         for player in self.players:
             player.rect.center = self.start
-        self.camera = Camera(760, 720)
+        self.camera = Camera(760, 800)
 
 
     def createLevel(self, x, y):
@@ -138,7 +140,7 @@ class World(object):
 
     def loadLevel(self):
 
-        lvl = Level((4,4))
+        lvl = Level((3,3))
         lvl.createPath()
 
         rooms = {
@@ -260,7 +262,6 @@ class World(object):
         running = True
         paused = False
         clock = pygame.time.Clock()
-
         while running:
             time = clock.get_time()
             pygame.display.set_caption("{:.2f}".format(clock.get_fps()))
@@ -315,6 +316,7 @@ class World(object):
                 GameOver = True
             scoreboard = self.myfont.render("{:.0f}".format(self.score), 1, (255,255,255))
             self.screen.blit(scoreboard, (1000, 40))
+
             pygame.display.update()
             clock.tick(60)
 

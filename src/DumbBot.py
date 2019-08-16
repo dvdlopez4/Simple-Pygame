@@ -1,4 +1,4 @@
-
+import os
 import pygame
 import time
 from math import *
@@ -13,12 +13,12 @@ class DumbBot(object):
         self.direction = 1
         self.players = world.players
         self.state = 0
-        self.hit = pygame.mixer.Sound("../assets/Hit.wav")
+        self.hit = pygame.mixer.Sound(os.path.abspath("./assets/Hit.wav"))
         self.garbage = [
-            pygame.mixer.Sound("../assets/Enemy1.wav"),
-            pygame.mixer.Sound("../assets/Enemy2.wav"),
-            pygame.mixer.Sound("../assets/Enemy3.wav"),
-            pygame.mixer.Sound("../assets/Enemy4.wav")
+            pygame.mixer.Sound(os.path.abspath("./assets/Enemy1.wav")),
+            pygame.mixer.Sound(os.path.abspath("./assets/Enemy2.wav")),
+            pygame.mixer.Sound(os.path.abspath("./assets/Enemy3.wav")),
+            pygame.mixer.Sound(os.path.abspath("./assets/Enemy4.wav"))
         ]
 
     def update(self, Entity):

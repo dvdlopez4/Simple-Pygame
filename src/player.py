@@ -1,3 +1,4 @@
+import os
 from entity import *
 from Particle import *
 from graphics import *
@@ -15,9 +16,9 @@ class Player(Entity):
         self.canDash = True
         self.canJump = True
         self.invincibility = 0
-        self.jumpSound = [pygame.mixer.Sound("../assets/Jump2_01.wav"), pygame.mixer.Sound("../assets/Jump_01.wav")]
-        self.slashSound = pygame.mixer.Sound("../assets/Sword_01.wav")
-        self.SpriteSheet = pygame.image.load('../assets/adventurer-Sheet.png').convert_alpha()
+        self.jumpSound = [pygame.mixer.Sound(os.path.abspath("./assets/Jump2_01.wav")), pygame.mixer.Sound(os.path.abspath("./assets/Jump_01.wav"))]
+        self.slashSound = pygame.mixer.Sound(os.path.abspath("./assets/Sword_01.wav"))
+        self.SpriteSheet = pygame.image.load(os.path.abspath('./assets/adventurer-Sheet.png')).convert_alpha()
         self.isFacingRight = True
         self.hurtRect = pygame.Rect(self.rect)
         self.canHurt = False

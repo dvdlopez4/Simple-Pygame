@@ -1,3 +1,4 @@
+import os
 from entity import *
 from Particle import *
 from graphics import *

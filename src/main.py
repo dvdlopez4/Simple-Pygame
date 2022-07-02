@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from World import *
-
+import Entity.Player.player
 
 def main():
     world = World()

@@ -1,21 +1,21 @@
 import os
 import pygame
 import json
-from physics import *
-from DumbBot import *
-from player import *
-from graphics import *
+from Components.physics import *
+from Entity.DumbBot import *
+from Entity.Player.player import *
+from Components.graphics import *
 from math import *
-from Wall import *
-from EndBlock import *
-from Bot import *
-from KeyBoardInput import *
-from GamePadInput import *
+from Entity.Wall import *
+from Entity.EndBlock import *
+from Entity.Bot import *
+from Components.KeyBoardInput import *
+from Components.GamePadInput import *
 from pygame.locals import *
 from Camera import *
-from Particle import *
+from Entity.Particle import *
 import random
-from constants import ASSET_FILE_PATH, SRC_FILE_PATH
+from Util.constants import ASSET_FILE_PATH
 
 
 class Level(object):
@@ -248,7 +248,7 @@ class World(object):
 
 
     def loadAssets(self):
-        f = open(f"{SRC_FILE_PATH}data.json", "r")
+        f = open(f'{ASSET_FILE_PATH}/data/data.json', "r")
         self.data = json.load(f)
         f.close()
 

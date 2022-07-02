@@ -1,8 +1,7 @@
-import os
-from entity import *
-from Particle import *
-from graphics import *
-from constants import ASSET_FILE_PATH
+from Entity.entity import *
+from Components.graphics import *
+from Entity.Particle import *
+from Util.constants import ASSET_FILE_PATH
 
 class Player(Entity):
     def __init__(self, _input, _physics, _graphics):

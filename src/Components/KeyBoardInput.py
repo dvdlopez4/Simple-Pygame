@@ -1,5 +1,5 @@
 import pygame
-from PlayerStates import *
+from Entity.Player.PlayerStates import *
 
 
 class KeyBoardInput(object):

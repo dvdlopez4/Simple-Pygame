@@ -6,6 +6,7 @@ from physics import *
 from graphics import *
 from entity import *
 import random
+from constants import ASSET_FILE_PATH
 
 
 class DumbBot(object):
@@ -13,12 +14,12 @@ class DumbBot(object):
         self.direction = 1
         self.players = world.players
         self.state = 0
-        self.hit = pygame.mixer.Sound(os.path.abspath("./assets/Hit.wav"))
+        self.hit = pygame.mixer.Sound(f'{ASSET_FILE_PATH}sound/Hit.wav')
         self.garbage = [
-            pygame.mixer.Sound(os.path.abspath("./assets/Enemy1.wav")),
-            pygame.mixer.Sound(os.path.abspath("./assets/Enemy2.wav")),
-            pygame.mixer.Sound(os.path.abspath("./assets/Enemy3.wav")),
-            pygame.mixer.Sound(os.path.abspath("./assets/Enemy4.wav"))
+            pygame.mixer.Sound(f'{ASSET_FILE_PATH}/sound/Enemy1.wav'),
+            pygame.mixer.Sound(f'{ASSET_FILE_PATH}/sound/Enemy2.wav'),
+            pygame.mixer.Sound(f'{ASSET_FILE_PATH}/sound/Enemy3.wav'),
+            pygame.mixer.Sound(f'{ASSET_FILE_PATH}/sound/Enemy4.wav')
         ]
 
     def update(self, Entity):

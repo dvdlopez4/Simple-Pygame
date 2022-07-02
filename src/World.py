@@ -15,6 +15,7 @@ from pygame.locals import *
 from Camera import *
 from Particle import *
 import random
+from constants import ASSET_FILE_PATH, SRC_FILE_PATH
 
 
 class Level(object):
@@ -114,8 +115,8 @@ class World(object):
     def createLevel(self, x, y):
 
         square = 40
-        rawImage = pygame.image.load('../assets/platform.png').convert()
-        enemyImage = pygame.image.load('../assets/enemy.png').convert_alpha()
+        rawImage = pygame.image.load(f'{ASSET_FILE_PATH}background/platform.png').convert()
+        enemyImage = pygame.image.load(f'{ASSET_FILE_PATH}sprites/enemy.png').convert_alpha()
         currentX = 0
         currentY = 0
         wallCount = 0
@@ -247,13 +248,13 @@ class World(object):
 
 
     def loadAssets(self):
-        f = open("data.json", "r")
+        f = open(f"{SRC_FILE_PATH}data.json", "r")
         self.data = json.load(f)
         f.close()
 
         self.loadLevel()
-        self.explosion = pygame.image.load('../assets/spritesheet.png').convert_alpha()
-        rawImage = pygame.image.load('../assets/game_background_4.png').convert()
+        self.explosion = pygame.image.load(f'{ASSET_FILE_PATH}/sprites/spritesheet.png').convert_alpha()
+        rawImage = pygame.image.load(f'{ASSET_FILE_PATH}/background/game_background_4.png').convert()
         self.image = pygame.transform.scale(rawImage, (1280, 720))
 
 

@@ -1,6 +1,6 @@
 import pygame
 import time
-from Bot import *
+from Entity.Bot import *
 
 class DamageBlock(object):
     def __init__(self):

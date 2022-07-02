@@ -1,4 +1,4 @@
-from entity import *
+from Entity.entity import *
 
 class Wall(Entity):
     def __init__(self, _input, _physics, _graphics, x, y, w, h):

@@ -2,11 +2,11 @@ import os
 import pygame
 import time
 from math import *
-from physics import *
-from graphics import *
-from entity import *
+from Components.physics import *
+from Components.graphics import *
+from Entity.entity import *
 import random
-from constants import ASSET_FILE_PATH
+from Util.constants import ASSET_FILE_PATH
 
 
 class DumbBot(object):

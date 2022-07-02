@@ -1,4 +1,4 @@
-from entity import *
+from Entity.entity import *
 import pygame
 
 class EndBlock(Entity):

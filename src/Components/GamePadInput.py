@@ -1,8 +1,8 @@
 import pygame
 import numpy as np
-from entity import *
-from PlayerStates import *
-from DamageBlock import *
+from Entity.entity import *
+from Entity.Player.PlayerStates import *
+from Entity.DamageBlock import *
 
 
 class GamePadInput(object):

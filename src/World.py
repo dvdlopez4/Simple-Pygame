@@ -15,7 +15,7 @@ from pygame.locals import *
 from Camera import *
 from Entity.Particle import *
 import random
-from Util.constants import ASSET_FILE_PATH
+from Util.constants import ASSET_FILE_PATH, SCREEN_WIDTH, SCREEN_HEIGHT
 
 
 class Level(object):
@@ -60,8 +60,6 @@ class Level(object):
                 direction = self.getDirection(room, size)
                 state = AdjacentRoomState
 
-            print("floor", type(floor))
-            print("room", type(room))
             self.Layout[floor][int(room)] = roomType
     
     def generateLines(self, rooms):
@@ -97,7 +95,7 @@ class World(object):
         self.myfont = pygame.font.SysFont("monospace", 34, bold=True)
         self.score = 0
         pygame.display.set_caption("Simple Game")
-        self.screen = pygame.display.set_mode((1280, 720))
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.joystick.init()
         self.joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
         for stick in self.joysticks:
@@ -121,7 +119,6 @@ class World(object):
         currentY = 0
         wallCount = 0
         for row in self.CurrentLevel:
-            print(row)
             for char in row:
                 if char == 'w':
                     self.platforms.append(Wall(None, None, GraphicsComponent(self.screen, None),x,y,square,square))
@@ -255,7 +252,7 @@ class World(object):
         self.loadLevel()
         self.explosion = pygame.image.load(f'{ASSET_FILE_PATH}/sprites/spritesheet.png').convert_alpha()
         rawImage = pygame.image.load(f'{ASSET_FILE_PATH}/background/game_background_4.png').convert()
-        self.image = pygame.transform.scale(rawImage, (1280, 720))
+        self.image = pygame.transform.scale(rawImage, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 
     def run(self):
@@ -313,7 +310,7 @@ class World(object):
 
             if not len(self.players):
                 label = self.myfont.render("Game Over", 1, (255,255,255))
-                self.screen.blit(label, (1280 // 2 - label.get_rect().right, 720 // 2 - label.get_rect().h))
+                self.screen.blit(label, (SCREEN_WIDTH // 2 - label.get_rect().right, SCREEN_HEIGHT // 2 - label.get_rect().h))
                 GameOver = True
             scoreboard = self.myfont.render("{:.0f}".format(self.score), 1, (255,255,255))
             self.screen.blit(scoreboard, (1000, 40))
@@ -353,8 +350,8 @@ class World(object):
         if len(self.players):
             for hitpoint in range(self.players[0].maxHealth):
                 if hitpoint + 1 <= self.players[0].health:
-                    pygame.draw.rect(self.screen, (255, 0, 0), (20 + hitpoint * 23, int(720 * 0.025), 20, 20))
-                pygame.draw.rect(self.screen, (255, 255, 255), (20 + hitpoint * 23, int(720 * 0.025), 20, 20), 2)
+                    pygame.draw.rect(self.screen, (255, 0, 0), (20 + hitpoint * 23, int(SCREEN_HEIGHT * 0.025), 20, 20))
+                pygame.draw.rect(self.screen, (255, 255, 255), (20 + hitpoint * 23, int(SCREEN_HEIGHT * 0.025), 20, 20), 2)
 
 
     def addEntity(self, Entity):

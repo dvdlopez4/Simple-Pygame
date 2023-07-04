@@ -122,9 +122,6 @@ class World(object):
             f'{ASSET_FILE_PATH}background/platform.png').convert()
         enemyImage = pygame.image.load(
             f'{ASSET_FILE_PATH}sprites/enemy.png').convert_alpha()
-        currentX = 0
-        currentY = 0
-        wallCount = 0
         for row in self.CurrentLevel:
             for char in row:
                 if char == 'w':
@@ -270,9 +267,9 @@ class World(object):
             rawImage, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
     def run(self):
-        total = 0
         running = True
         paused = False
+        GameOver = False
         clock = pygame.time.Clock()
         while running:
             time = clock.get_time()

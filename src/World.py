@@ -23,16 +23,20 @@ class Level(object):
         self.Layout = np.zeros(shape, dtype=int).tolist()
 
     def getDirection(self, room, size):
-        if room == 0: direction = 1
-        elif room == size: direction = -1
-        else: direction = pow(-1,random.randint(0,1))
+        if room == 0:
+            direction = 1
+        elif room == size:
+            direction = -1
+        else:
+            direction = pow(-1, random.randint(0, 1))
 
         return direction
 
     def createPath(self):
-        (ChooseStartState, AdjacentRoomState, NextFloorState) = (1,2,3)
+        (ChooseStartState, AdjacentRoomState, NextFloorState) = (1, 2, 3)
         size = len(self.Layout[0]) - 1
-        if not size: return 0
+        if not size:
+            return 0
         height = len(self.Layout) - 1
         room = 0
         state = ChooseStartState
@@ -52,7 +56,7 @@ class Level(object):
                 if direction != 0 and ((room == 0 or room == size) or random.random() < floorChance):
                     state = NextFloorState
                     roomType = "drop"
-                    if floor == height: 
+                    if floor == height:
                         done = True
                         roomType = "end"
             elif state == NextFloorState:
@@ -61,7 +65,7 @@ class Level(object):
                 state = AdjacentRoomState
 
             self.Layout[floor][int(room)] = roomType
-    
+
     def generateLines(self, rooms):
         mapLines = []
         for floor in self.Layout:
@@ -77,6 +81,7 @@ class Level(object):
                 mapLines.append(line + "w")
 
         return mapLines
+
 
 class World(object):
     def __init__(self):
@@ -97,31 +102,34 @@ class World(object):
         pygame.display.set_caption("Simple Game")
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.joystick.init()
-        self.joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+        self.joysticks = [pygame.joystick.Joystick(
+            x) for x in range(pygame.joystick.get_count())]
         for stick in self.joysticks:
             stick.init()
 
-
         self.loadAssets()
-        player = Player(KeyBoardInput(), PhysicsComponent(self), PlayerGraphics(self.screen))
+        player = Player(KeyBoardInput(), PhysicsComponent(
+            self), PlayerGraphics(self.screen))
         self.addEntity(player)
         for player in self.players:
             player.rect.center = self.start
         self.camera = Camera(760, 800)
 
-
     def createLevel(self, x, y):
 
         square = 40
-        rawImage = pygame.image.load(f'{ASSET_FILE_PATH}background/platform.png').convert()
-        enemyImage = pygame.image.load(f'{ASSET_FILE_PATH}sprites/enemy.png').convert_alpha()
+        rawImage = pygame.image.load(
+            f'{ASSET_FILE_PATH}background/platform.png').convert()
+        enemyImage = pygame.image.load(
+            f'{ASSET_FILE_PATH}sprites/enemy.png').convert_alpha()
         currentX = 0
         currentY = 0
         wallCount = 0
         for row in self.CurrentLevel:
             for char in row:
                 if char == 'w':
-                    self.platforms.append(Wall(None, None, GraphicsComponent(self.screen, None),x,y,square,square))
+                    self.platforms.append(Wall(None, None, GraphicsComponent(
+                        self.screen, None), x, y, square, square))
                 if char == 'e':
                     self.end = EndBlock(x, y, square, square)
                     self.end.graphics = EndGraphics(self.screen)
@@ -129,7 +137,8 @@ class World(object):
                 if char == 's':
                     self.start = x, y
                 if char == 'b':
-                    bot = Bot(DumbBot(self), PhysicsComponent(self), GraphicsComponent(self.screen, enemyImage))
+                    bot = Bot(DumbBot(self), PhysicsComponent(self),
+                              GraphicsComponent(self.screen, enemyImage))
                     bot.rect.center = x, y
                     self.addEntity(bot)
                 x += square
@@ -138,66 +147,66 @@ class World(object):
 
     def loadLevel(self):
 
-        lvl = Level((3,3))
+        lvl = Level((3, 3))
         lvl.createPath()
 
         rooms = {
             "hall": [
-                ["       w", 
+                ["       w",
                  "   www w",
-                 "       w", 
-                 "  www  w", 
-                 " wwww   ", 
-                 " wwww   ", 
-                 " w      ", 
+                 "       w",
+                 "  www  w",
+                 " wwww   ",
+                 " wwww   ",
+                 " w      ",
                  "wwwwwwww"],
-                ["        ", 
+                ["        ",
                  "   w w  ",
-                 "    w   ", 
-                 "    w   ", 
-                 "        ", 
-                 "    ww  ", 
-                 " w wwwww", 
-                 "wwwwwwww"],
-                ["    w   ", 
-                 "   www  ",
-                 "        ", 
-                 "www     ", 
-                 "     w  ", 
-                 "    ww  ", 
-                 " www w  ", 
-                 "wwwwwwww"],
-                ["       w", 
-                 "  w     ",
-                 "  w     ", 
-                 "www    w", 
-                 "w       ", 
-                 "w       ", 
-                 "w       ", 
-                 "wwwwwwww"],
-                ["      ww", 
-                 "w     ww",
-                 "        ", 
-                 "        ", 
-                 "        ", 
-                 "wwwww   ", 
-                 "    w   ", 
-                 "wwwwwwww"],
-                ["ww      ", 
-                 "  w     ",
-                 "        ", 
-                 "w ww    ", 
-                 "     w  ", 
-                 "     w  ", 
-                 "     w  ", 
-                 "wwwwwwww"],
-                ["   w    ", 
+                 "    w   ",
+                 "    w   ",
                  "        ",
-                 "   wwwww", 
-                 "ww      ", 
-                 "  www   ", 
-                 "    w   ", 
-                 " w    w ", 
+                 "    ww  ",
+                 " w wwwww",
+                 "wwwwwwww"],
+                ["    w   ",
+                 "   www  ",
+                 "        ",
+                 "www     ",
+                 "     w  ",
+                 "    ww  ",
+                 " www w  ",
+                 "wwwwwwww"],
+                ["       w",
+                 "  w     ",
+                 "  w     ",
+                 "www    w",
+                 "w       ",
+                 "w       ",
+                 "w       ",
+                 "wwwwwwww"],
+                ["      ww",
+                 "w     ww",
+                 "        ",
+                 "        ",
+                 "        ",
+                 "wwwww   ",
+                 "    w   ",
+                 "wwwwwwww"],
+                ["ww      ",
+                 "  w     ",
+                 "        ",
+                 "w ww    ",
+                 "     w  ",
+                 "     w  ",
+                 "     w  ",
+                 "wwwwwwww"],
+                ["   w    ",
+                 "        ",
+                 "   wwwww",
+                 "ww      ",
+                 "  www   ",
+                 "    w   ",
+                 " w    w ",
                  "wwwwwwww"],
             ],
             "drop": [
@@ -227,22 +236,25 @@ class World(object):
                  "        "]
             ],
             0: [
-                ["wwwwwwww", "wwwww   ", "wwwww   ", "wwwww   ","wwwww   ","wwwww   ","wwwww   ", "wwwwwwww"],
-                ["    wwww", "w   w   ", "  www   ", "        ","        ","        ","        ", "wwwwwwww"],
-                ["wwwwwwww", "wwwwwwww", "wwwwwwww", "wwwwwwww","wwwwwwww","wwwwwwww","wwwwwwww", "wwwwwwww"],
+                ["wwwwwwww", "wwwww   ", "wwwww   ", "wwwww   ",
+                    "wwwww   ", "wwwww   ", "wwwww   ", "wwwwwwww"],
+                ["    wwww", "w   w   ", "  www   ", "        ",
+                    "        ", "        ", "        ", "wwwwwwww"],
+                ["wwwwwwww", "wwwwwwww", "wwwwwwww", "wwwwwwww",
+                    "wwwwwwww", "wwwwwwww", "wwwwwwww", "wwwwwwww"],
             ],
-            "start": [["        ","        ","        ","        ", "        ", " ^      ", "(e)     ", "wwwwwwww"]],
-            "end": [["        ","        ","        ","        ", "        ", " ^      ", "(s)     ", "wwwwwwww"]]
+            "start": [["        ", "        ", "        ", "        ", "        ", " ^      ", "(e)     ", "wwwwwwww"]],
+            "end": [["        ", "        ", "        ", "        ", "        ", " ^      ", "(s)     ", "wwwwwwww"]]
         }
         level = lvl.generateLines(rooms)
-        
+
         self.CurrentLevel = level
         self.entities.clear()
         self.platforms.clear()
-        self.platforms.append(Wall(None, None, GraphicsComponent(self.screen, None),0,0,1320,40))
+        self.platforms.append(
+            Wall(None, None, GraphicsComponent(self.screen, None), 0, 0, 1320, 40))
 
         self.createLevel(0, 0)
-
 
     def loadAssets(self):
         f = open(f'{ASSET_FILE_PATH}/data/data.json', "r")
@@ -250,10 +262,12 @@ class World(object):
         f.close()
 
         self.loadLevel()
-        self.explosion = pygame.image.load(f'{ASSET_FILE_PATH}/sprites/spritesheet.png').convert_alpha()
-        rawImage = pygame.image.load(f'{ASSET_FILE_PATH}/background/game_background_4.png').convert()
-        self.image = pygame.transform.scale(rawImage, (SCREEN_WIDTH, SCREEN_HEIGHT))
-
+        self.explosion = pygame.image.load(
+            f'{ASSET_FILE_PATH}/sprites/spritesheet.png').convert_alpha()
+        rawImage = pygame.image.load(
+            f'{ASSET_FILE_PATH}/background/game_background_4.png').convert()
+        self.image = pygame.transform.scale(
+            rawImage, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
     def run(self):
         total = 0
@@ -274,12 +288,12 @@ class World(object):
                 if e.type == pygame.KEYDOWN and e.key == pygame.K_RETURN:
                     if GameOver:
                         self.loadLevel()
-                        player = Player(KeyBoardInput(), PhysicsComponent(self), PlayerGraphics(self.screen))
+                        player = Player(KeyBoardInput(), PhysicsComponent(
+                            self), PlayerGraphics(self.screen))
                         player.rect.center = self.start
                         self.addEntity(player)
                         GameOver = False
                         self.score = 0
-
 
             if len(self.players) and self.end.check(self.players[0]):
                 self.loadLevel()
@@ -287,8 +301,6 @@ class World(object):
                 for player in self.players:
                     player.rect.center = self.start
                     self.entities.append(player)
-
-
 
             if not paused:
                 if pygame.mixer.get_busy():
@@ -307,23 +319,24 @@ class World(object):
                 if player.rect.y > 1320 or player.health <= 0:
                     self.players.remove(player)
 
-
             if not len(self.players):
-                label = self.myfont.render("Game Over", 1, (255,255,255))
-                self.screen.blit(label, (SCREEN_WIDTH // 2 - label.get_rect().right, SCREEN_HEIGHT // 2 - label.get_rect().h))
+                label = self.myfont.render("Game Over", 1, (255, 255, 255))
+                self.screen.blit(
+                    label, (SCREEN_WIDTH // 2 - label.get_rect().right, SCREEN_HEIGHT // 2 - label.get_rect().h))
                 GameOver = True
-            scoreboard = self.myfont.render("{:.0f}".format(self.score), 1, (255,255,255))
+            scoreboard = self.myfont.render(
+                "{:.0f}".format(self.score), 1, (255, 255, 255))
             self.screen.blit(scoreboard, (1000, 40))
 
             pygame.display.update()
             clock.tick(60)
 
-
     def input(self):
         for e in self.entities:
             e.handleInput()
             if e.health <= 0:
-                explosion = Particle(None, None, ExplosionGraphics(self.screen, self.explosion))
+                explosion = Particle(None, None, ExplosionGraphics(
+                    self.screen, self.explosion))
                 explosion.rect = e.rect
                 explosion.centerx = e.rect.centerx - 100
                 self.entities.remove(e)
@@ -337,8 +350,9 @@ class World(object):
             for e in self.entities:
                 e.update(time)
             self.lag -= self.MS_PER_UPDATE
+
     def render(self):
-        self.screen.blit(self.image, (0,0))
+        self.screen.blit(self.image, (0, 0))
         for e in self.entities:
             e.render(self.camera)
         for platform in self.platforms:
@@ -346,13 +360,13 @@ class World(object):
         for particles in self.particles:
             particles.render(self.camera)
 
-
         if len(self.players):
             for hitpoint in range(self.players[0].maxHealth):
                 if hitpoint + 1 <= self.players[0].health:
-                    pygame.draw.rect(self.screen, (255, 0, 0), (20 + hitpoint * 23, int(SCREEN_HEIGHT * 0.025), 20, 20))
-                pygame.draw.rect(self.screen, (255, 255, 255), (20 + hitpoint * 23, int(SCREEN_HEIGHT * 0.025), 20, 20), 2)
-
+                    pygame.draw.rect(
+                        self.screen, (255, 0, 0), (20 + hitpoint * 23, int(SCREEN_HEIGHT * 0.025), 20, 20))
+                pygame.draw.rect(self.screen, (255, 255, 255), (20 +
+                                 hitpoint * 23, int(SCREEN_HEIGHT * 0.025), 20, 20), 2)
 
     def addEntity(self, Entity):
         if type(Entity) == Player:

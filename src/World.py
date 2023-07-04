@@ -13,81 +13,18 @@ from Components.KeyBoardInput import *
 from Components.GamePadInput import *
 from pygame.locals import *
 from Camera import *
+from Level import *
 from Entity.Particle import *
 import random
 from Util.constants import ASSET_FILE_PATH, SCREEN_WIDTH, SCREEN_HEIGHT, ROOMS
-
-
-class Level(object):
-    def __init__(self, shape):
-        self.Layout = np.zeros(shape, dtype=int).tolist()
-
-    def getDirection(self, room, size):
-        if room == 0:
-            direction = 1
-        elif room == size:
-            direction = -1
-        else:
-            direction = pow(-1, random.randint(0, 1))
-
-        return direction
-
-    def createPath(self):
-        (ChooseStartState, AdjacentRoomState, NextFloorState) = (1, 2, 3)
-        size = len(self.Layout[0]) - 1
-        if not size:
-            return 0
-        height = len(self.Layout) - 1
-        room = 0
-        state = ChooseStartState
-        floor = 0
-        direction = 0
-        done = False
-        floorChance = 0.6
-        while not done:
-            roomType = "hall"
-            if state == ChooseStartState:
-                room = random.randint(0, size)
-                direction = self.getDirection(room, size)
-                state = AdjacentRoomState
-                roomType = "start"
-            elif state == AdjacentRoomState:
-                room += direction
-                if direction != 0 and ((room == 0 or room == size) or random.random() < floorChance):
-                    state = NextFloorState
-                    roomType = "drop"
-                    if floor == height:
-                        done = True
-                        roomType = "end"
-            elif state == NextFloorState:
-                floor += 1
-                direction = self.getDirection(room, size)
-                state = AdjacentRoomState
-
-            self.Layout[floor][int(room)] = roomType
-
-    def generateLines(self, rooms):
-        mapLines = []
-        for floor in self.Layout:
-            lines = np.zeros(len(rooms[0][0])).tolist()
-            lines = list(map(lambda x: "w", lines))
-
-            for room in floor:
-                select = random.randint(0, len(rooms[room]) - 1)
-                for index, line in enumerate(lines):
-                    lines[index] += (rooms[room])[select][index]
-
-            for line in lines:
-                mapLines.append(line + "w")
-
-        return mapLines
-
 
 PLAY_STATE = 0
 START_MENU_STATE = 1
 PAUSE_STATE = 2
 GAME_OVER_STATE = 3
 RESTART_STATE = 4
+HEIGHT_THRESHOLD = 1320
+POINTS_PER_LEVEL = 100
 
 
 class World(object):
@@ -120,14 +57,13 @@ class World(object):
         self.addEntity(player)
         for player in self.players:
             player.rect.center = self.start
+
         self.camera = Camera(760, 800)
         self.game_state = PLAY_STATE
 
     def createLevel(self, x, y):
 
         square = 40
-        rawImage = pygame.image.load(
-            f'{ASSET_FILE_PATH}background/platform.png').convert()
         enemyImage = pygame.image.load(
             f'{ASSET_FILE_PATH}sprites/enemy.png').convert_alpha()
         for row in self.CurrentLevel:
@@ -135,17 +71,21 @@ class World(object):
                 if char == 'w':
                     self.platforms.append(Wall(None, None, GraphicsComponent(
                         self.screen, None), x, y, square, square))
+
                 if char == 'e':
                     self.end = EndBlock(x, y, square, square)
                     self.end.graphics = EndGraphics(self.screen)
                     self.addEntity(self.end)
+
                 if char == 's':
                     self.start = x, y
+
                 if char == 'b':
                     bot = Bot(DumbBot(self), PhysicsComponent(self),
                               GraphicsComponent(self.screen, enemyImage))
                     bot.rect.center = x, y
                     self.addEntity(bot)
+
                 x += square
             y += square
             x = square
@@ -161,7 +101,7 @@ class World(object):
         self.entities.clear()
         self.platforms.clear()
         self.platforms.append(
-            Wall(None, None, GraphicsComponent(self.screen, None), 0, 0, 1320, 40))
+            Wall(None, None, GraphicsComponent(self.screen, None), 0, 0, HEIGHT_THRESHOLD, 40))
 
         self.createLevel(0, 0)
 
@@ -189,8 +129,7 @@ class World(object):
             for e in pygame.event.get():
                 key_events.append(e)
 
-            key_event = self.getKeyEvent(key_events)
-            if key_event != None and key_event.type == pygame.KEYDOWN and key_event.key == pygame.K_ESCAPE:
+            if len(key_events) > 0 and key_events[0].type == pygame.KEYDOWN and key_events[0].key == pygame.K_ESCAPE:
                 break
 
             if (self.game_state == PLAY_STATE):
@@ -203,14 +142,15 @@ class World(object):
                 self.render()
                 self.logic()
 
-                if key_event != None and key_event.type == pygame.KEYDOWN and key_event.key == pygame.K_p:
+                if len(key_events) > 0 and key_events[0].type == pygame.KEYDOWN and key_events[0].key == pygame.K_p:
                     self.game_state = PAUSE_STATE
                 elif not len(self.players):
                     self.game_state = GAME_OVER_STATE
 
             elif self.game_state == PAUSE_STATE:
-                if key_event != None and key_event.type == pygame.KEYDOWN and key_event.key == pygame.K_p:
+                if len(key_events) > 0 and key_events[0].type == pygame.KEYDOWN and key_events[0].key == pygame.K_p:
                     self.game_state = PLAY_STATE
+
                 pygame.mixer.pause()
 
             elif self.game_state == GAME_OVER_STATE:
@@ -219,7 +159,7 @@ class World(object):
                 self.screen.blit(
                     label, (SCREEN_WIDTH // 2 - label.get_rect().right, SCREEN_HEIGHT // 2 - label.get_rect().h))
 
-                if key_event != None and key_event.type == pygame.KEYDOWN and key_event.key == pygame.K_RETURN:
+                if len(key_events) > 0 and key_events[0].type == pygame.KEYDOWN and key_events[0].key == pygame.K_RETURN:
                     self.game_state = RESTART_STATE
 
             elif self.game_state == RESTART_STATE:
@@ -241,13 +181,16 @@ class World(object):
     def input(self):
         for e in self.entities:
             e.handleInput()
-            if e.health <= 0:
-                explosion = Particle(None, None, ExplosionGraphics(
-                    self.screen, self.explosion))
-                explosion.rect = e.rect
-                explosion.centerx = e.rect.centerx - 100
-                self.entities.remove(e)
-                self.particles.append(explosion)
+            if e.health > 0:
+                continue
+
+            explosion = Particle(None, None, ExplosionGraphics(
+                self.screen, self.explosion))
+            explosion.rect = e.rect
+            explosion.centerx = e.rect.centerx - 100
+            self.entities.remove(e)
+            self.particles.append(explosion)
+
         for player in self.players:
             player.renew(self)
 
@@ -262,11 +205,14 @@ class World(object):
         self.screen.blit(self.image, (0, 0))
         for e in self.entities:
             e.render(self.camera)
+
         for platform in self.platforms:
             platform.render(self.camera)
+
         for particles in self.particles:
             if particles.isDone:
                 continue
+
             particles.render(self.camera)
 
     def logic(self):
@@ -282,7 +228,7 @@ class World(object):
         HEALTH_BOX_WIDTH = HEALTH_BOX_HEIGHT = 20
 
         for hitpoint in range(self.players[0].maxHealth):
-            if hitpoint + 1 > self.players[0].health:
+            if hitpoint >= self.players[0].health:
                 continue
 
             xPos = (HEALTH_BOX_WIDTH + hitpoint * HEALTH_LEFT_OFFSET)
@@ -294,24 +240,20 @@ class World(object):
             pygame.draw.rect(SURFACE, HEALTH_BORDER_COLOR_WHITE,
                              HEALTH_BAR_RECT, BORDER_RADIUS)
 
+        # Remove players that have fallen through the map
         for player in self.players:
-            if player.rect.y < 1320 and player.health > 0:
+            if player.rect.y < HEIGHT_THRESHOLD and player.health > 0:
                 continue
 
             self.players.remove(player)
 
+        # Player reached the end of the level, go to the next level
         if len(self.players) and self.end.check(self.players[0]):
             self.loadLevel()
-            self.score += 100
+            self.score += POINTS_PER_LEVEL
             for player in self.players:
                 player.rect.center = self.start
                 self.entities.append(player)
-
-    def getKeyEvent(self, key_events):
-        if (len(key_events) <= 0):
-            return None
-
-        return key_events[0]
 
     def addEntity(self, Entity):
         if type(Entity) == Player:

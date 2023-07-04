@@ -15,7 +15,7 @@ from pygame.locals import *
 from Camera import *
 from Entity.Particle import *
 import random
-from Util.constants import ASSET_FILE_PATH, SCREEN_WIDTH, SCREEN_HEIGHT
+from Util.constants import ASSET_FILE_PATH, SCREEN_WIDTH, SCREEN_HEIGHT, ROOMS
 
 
 class Level(object):
@@ -83,6 +83,13 @@ class Level(object):
         return mapLines
 
 
+PLAY_STATE = 0
+START_MENU_STATE = 1
+PAUSE_STATE = 2
+GAME_OVER_STATE = 3
+RESTART_STATE = 4
+
+
 class World(object):
     def __init__(self):
         self.entities = []
@@ -114,6 +121,7 @@ class World(object):
         for player in self.players:
             player.rect.center = self.start
         self.camera = Camera(760, 800)
+        self.game_state = PLAY_STATE
 
     def createLevel(self, x, y):
 
@@ -147,103 +155,7 @@ class World(object):
         lvl = Level((3, 3))
         lvl.createPath()
 
-        rooms = {
-            "hall": [
-                ["       w",
-                 "   www w",
-                 "       w",
-                 "  www  w",
-                 " wwww   ",
-                 " wwww   ",
-                 " w      ",
-                 "wwwwwwww"],
-                ["        ",
-                 "   w w  ",
-                 "    w   ",
-                 "    w   ",
-                 "        ",
-                 "    ww  ",
-                 " w wwwww",
-                 "wwwwwwww"],
-                ["    w   ",
-                 "   www  ",
-                 "        ",
-                 "www     ",
-                 "     w  ",
-                 "    ww  ",
-                 " www w  ",
-                 "wwwwwwww"],
-                ["       w",
-                 "  w     ",
-                 "  w     ",
-                 "www    w",
-                 "w       ",
-                 "w       ",
-                 "w       ",
-                 "wwwwwwww"],
-                ["      ww",
-                 "w     ww",
-                 "        ",
-                 "        ",
-                 "        ",
-                 "wwwww   ",
-                 "    w   ",
-                 "wwwwwwww"],
-                ["ww      ",
-                 "  w     ",
-                 "        ",
-                 "w ww    ",
-                 "     w  ",
-                 "     w  ",
-                 "     w  ",
-                 "wwwwwwww"],
-                ["   w    ",
-                 "        ",
-                 "   wwwww",
-                 "ww      ",
-                 "  www   ",
-                 "    w   ",
-                 " w    w ",
-                 "wwwwwwww"],
-            ],
-            "drop": [
-                ["        ",
-                 "        ",
-                 "        ",
-                 "        ",
-                 "     b  ",
-                 "        ",
-                 "        ",
-                 "        "],
-                ["        ",
-                 "        ",
-                 "        ",
-                 "    w   ",
-                 "        ",
-                 "  w    w",
-                 "        ",
-                 "   www  "],
-                ["     b  ",
-                 "   w w   ",
-                 "    w   ",
-                 "    w   ",
-                 "   w w  ",
-                 "  w   w ",
-                 "        ",
-                 "        "]
-            ],
-            0: [
-                ["wwwwwwww", "wwwww   ", "wwwww   ", "wwwww   ",
-                    "wwwww   ", "wwwww   ", "wwwww   ", "wwwwwwww"],
-                ["    wwww", "w   w   ", "  www   ", "        ",
-                    "        ", "        ", "        ", "wwwwwwww"],
-                ["wwwwwwww", "wwwwwwww", "wwwwwwww", "wwwwwwww",
-                    "wwwwwwww", "wwwwwwww", "wwwwwwww", "wwwwwwww"],
-            ],
-            "start": [["        ", "        ", "        ", "        ", "        ", " ^      ", "(e)     ", "wwwwwwww"]],
-            "end": [["        ", "        ", "        ", "        ", "        ", " ^      ", "(s)     ", "wwwwwwww"]]
-        }
-        level = lvl.generateLines(rooms)
+        level = lvl.generateLines(ROOMS)
 
         self.CurrentLevel = level
         self.entities.clear()
@@ -268,59 +180,57 @@ class World(object):
 
     def run(self):
         running = True
-        paused = False
-        GameOver = False
         clock = pygame.time.Clock()
         while running:
             time = clock.get_time()
             pygame.display.set_caption("{:.2f}".format(clock.get_fps()))
 
+            key_events = []
             for e in pygame.event.get():
-                if e.type == pygame.QUIT:
-                    running = False
-                if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
-                    running = False
-                if e.type == pygame.KEYDOWN and e.key == pygame.K_p:
-                    paused = not paused
-                if e.type == pygame.KEYDOWN and e.key == pygame.K_RETURN:
-                    if GameOver:
-                        self.loadLevel()
-                        player = Player(KeyBoardInput(), PhysicsComponent(
-                            self), PlayerGraphics(self.screen))
-                        player.rect.center = self.start
-                        self.addEntity(player)
-                        GameOver = False
-                        self.score = 0
+                key_events.append(e)
 
-            if len(self.players) and self.end.check(self.players[0]):
-                self.loadLevel()
-                self.score += 100
-                for player in self.players:
-                    player.rect.center = self.start
-                    self.entities.append(player)
+            key_event = self.getKeyEvent(key_events)
+            if key_event != None and key_event.type == pygame.KEYDOWN and key_event.key == pygame.K_ESCAPE:
+                break
 
-            if not paused:
+            if (self.game_state == PLAY_STATE):
                 if pygame.mixer.get_busy():
                     pygame.mixer.unpause()
-                for particle in self.particles:
-                    if particle.isDone:
-                        self.particles.remove(particle)
+
                 self.input()
                 self.physics(time)
                 self.camera.update(self.players)
                 self.render()
-            else:
+                self.logic()
+
+                if key_event != None and key_event.type == pygame.KEYDOWN and key_event.key == pygame.K_p:
+                    self.game_state = PAUSE_STATE
+                elif not len(self.players):
+                    self.game_state = GAME_OVER_STATE
+
+            elif self.game_state == PAUSE_STATE:
+                if key_event != None and key_event.type == pygame.KEYDOWN and key_event.key == pygame.K_p:
+                    self.game_state = PLAY_STATE
                 pygame.mixer.pause()
 
-            for player in self.players:
-                if player.rect.y > 1320 or player.health <= 0:
-                    self.players.remove(player)
-
-            if not len(self.players):
-                label = self.myfont.render("Game Over", 1, (255, 255, 255))
+            elif self.game_state == GAME_OVER_STATE:
+                label = self.myfont.render(
+                    "Game Over", 1, (255, 255, 255))
                 self.screen.blit(
                     label, (SCREEN_WIDTH // 2 - label.get_rect().right, SCREEN_HEIGHT // 2 - label.get_rect().h))
-                GameOver = True
+
+                if key_event != None and key_event.type == pygame.KEYDOWN and key_event.key == pygame.K_RETURN:
+                    self.game_state = RESTART_STATE
+
+            elif self.game_state == RESTART_STATE:
+                self.loadLevel()
+                player = Player(KeyBoardInput(), PhysicsComponent(
+                    self), PlayerGraphics(self.screen))
+                player.rect.center = self.start
+                self.addEntity(player)
+                self.score = 0
+                self.game_state = PLAY_STATE
+
             scoreboard = self.myfont.render(
                 "{:.0f}".format(self.score), 1, (255, 255, 255))
             self.screen.blit(scoreboard, (1000, 40))
@@ -355,15 +265,53 @@ class World(object):
         for platform in self.platforms:
             platform.render(self.camera)
         for particles in self.particles:
+            if particles.isDone:
+                continue
             particles.render(self.camera)
 
-        if len(self.players):
-            for hitpoint in range(self.players[0].maxHealth):
-                if hitpoint + 1 <= self.players[0].health:
-                    pygame.draw.rect(
-                        self.screen, (255, 0, 0), (20 + hitpoint * 23, int(SCREEN_HEIGHT * 0.025), 20, 20))
-                pygame.draw.rect(self.screen, (255, 255, 255), (20 +
-                                 hitpoint * 23, int(SCREEN_HEIGHT * 0.025), 20, 20), 2)
+    def logic(self):
+        if len(self.players) == 0:
+            return
+
+        SURFACE = self.screen
+        HEALTH_BORDER_COLOR_WHITE = (255, 255, 255)
+        HEALTH_FILL_COLOR_RED = (255, 0, 0)
+        BORDER_RADIUS = 2
+        HEALTH_LEFT_OFFSET = 23
+        HEALTH_TOP_COEFFICIENT = 0.025
+        HEALTH_BOX_WIDTH = HEALTH_BOX_HEIGHT = 20
+
+        for hitpoint in range(self.players[0].maxHealth):
+            if hitpoint + 1 > self.players[0].health:
+                continue
+
+            xPos = (HEALTH_BOX_WIDTH + hitpoint * HEALTH_LEFT_OFFSET)
+            yPos = int(SCREEN_HEIGHT * HEALTH_TOP_COEFFICIENT)
+
+            HEALTH_BAR_RECT = (xPos, yPos, HEALTH_BOX_WIDTH, HEALTH_BOX_HEIGHT)
+
+            pygame.draw.rect(SURFACE, HEALTH_FILL_COLOR_RED, HEALTH_BAR_RECT)
+            pygame.draw.rect(SURFACE, HEALTH_BORDER_COLOR_WHITE,
+                             HEALTH_BAR_RECT, BORDER_RADIUS)
+
+        for player in self.players:
+            if player.rect.y < 1320 and player.health > 0:
+                continue
+
+            self.players.remove(player)
+
+        if len(self.players) and self.end.check(self.players[0]):
+            self.loadLevel()
+            self.score += 100
+            for player in self.players:
+                player.rect.center = self.start
+                self.entities.append(player)
+
+    def getKeyEvent(self, key_events):
+        if (len(key_events) <= 0):
+            return None
+
+        return key_events[0]
 
     def addEntity(self, Entity):
         if type(Entity) == Player:

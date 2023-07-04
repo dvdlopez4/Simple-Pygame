@@ -22,7 +22,7 @@ class Player(Entity):
         ]
         self.slashSound = pygame.mixer.Sound(f"{ASSET_FILE_PATH}/sound/Sword_01.wav")
         self.SpriteSheet = pygame.image.load(f"{ASSET_FILE_PATH}/sprites/adventurer-Sheet.png").convert_alpha()
-        self.isFacingRight = True
+        self.directionFacing = 1
         self.hurtRect = pygame.Rect(self.rect)
         self.canHurt = False
 
@@ -81,10 +81,7 @@ class Player(Entity):
     def renew(self, world):
 
         if self.canHurt:
-            if self.isFacingRight:
-                self.hurtRect.centerx = self.rect.centerx + 30
-            else:
-                self.hurtRect.centerx = self.rect.centerx - 30
+            self.hurtRect.centerx = self.rect.centerx + (self.directionFacing * 30)
             self.hurtRect.centery = self.rect.centery - 14
             self.hurtRect.w = 30
             self.hurtRect.h = 10
@@ -93,10 +90,9 @@ class Player(Entity):
                     self.hits[entity] = True
                     entity.health -= 1
                     entity.rect.left = self.hurtRect.right
-                    entity.velocity[0] = 2000
-                    if not self.isFacingRight:
+                    entity.velocity[0] = (self.directionFacing * 2000)
+                    if self.directionFacing < 0:
                         entity.rect.right = self.hurtRect.left
-                        entity.velocity[0] = -2000
                     entity.velocity[1] = -150
                     particle = Particle(None, None, ExplosionGraphics(world.screen, world.explosion))
                     rect = world.explosion.get_rect()

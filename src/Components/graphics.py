@@ -30,7 +30,7 @@ class PlayerGraphics(object):
         rect = Entity.Animation[Entity.frameIndex].get_rect()
         rect.center = position.center
         rect.bottom = position.bottom
-        if not Entity.isFacingRight:
+        if Entity.directionFacing < 0:
             self.screen.blit(pygame.transform.flip(Entity.Animation[Entity.frameIndex], True, False), rect)
         else:
             self.screen.blit(Entity.Animation[Entity.frameIndex], rect)

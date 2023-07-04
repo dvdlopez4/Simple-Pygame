@@ -58,12 +58,11 @@ class RunningState(object):
             return DashState()
 
         if Input.Buttons[Input.Actions["Left"]]: 
-            Entity.velocity[0] = -150
-            Entity.isFacingRight = False
+            Entity.directionFacing = -1
         if Input.Buttons[Input.Actions["Right"]]: 
-            Entity.velocity[0] = 150
-            Entity.isFacingRight = True
+            Entity.directionFacing = 1
 
+        Entity.velocity[0] = (Entity.directionFacing * 150)
 
         self.ButtonsReleased = Input.GetButtons()
         return None
@@ -108,12 +107,9 @@ class DashState(object):
 
     def enter(self, Entity, Input):
         Entity.Animation = Entity.AnimationStates["dashing"]
-        # Entity.rect.centery += 15
-        Entity.rect.h = 25
-        if Entity.isFacingRight:
-            self.velocity = [450,0]
-        else:
-            self.velocity = [-450,0]
+        Entity.rect.centery += 25
+        Entity.rect.h = 5
+        self.velocity = [(Entity.directionFacing * 450),0]
 
 class JumpState(object):
     def __init__(self, jumps=1):
@@ -124,10 +120,10 @@ class JumpState(object):
         if Input.Buttons[Input.Actions["Attack"]] and not self.ButtonsReleased[Input.Actions["Attack"]]:
             return AttackState()
         if Input.Buttons[Input.Actions["Left"]]:
-            Entity.isFacingRight = False
+            Entity.directionFacing = -1
             Entity.velocity[0] = -150
         if Input.Buttons[Input.Actions["Right"]]:
-            Entity.isFacingRight = True
+            Entity.directionFacing = 1
             Entity.velocity[0] = 150
         if Entity.isOnGround:
             return StandingState()
@@ -178,9 +174,7 @@ class AttackState(object):
         Entity.velocity[1] = 0
         if Entity.frameIndex == len(Entity.AnimationStates) - 3:
             Entity.canHurt = True
-            Entity.velocity[0] = 50
-            if not Entity.isFacingRight:
-                Entity.velocity[0] = -50
+            Entity.velocity[0] = (Entity.directionFacing * 50)
 
     def exit(self, Entity, Input):
         Entity.canHurt = False

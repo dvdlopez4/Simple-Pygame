@@ -112,6 +112,5 @@ class Player(Entity):
             entity.velocity[1] = -150
             particle = Particle(None, None, ExplosionGraphics(
                 world.screen, world.explosion))
-            rect = world.explosion.get_rect()
             particle.rect.center = self.rect.centerx - 15, self.rect.centery - 50
             world.particles.append(particle)

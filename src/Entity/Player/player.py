@@ -1,7 +1,9 @@
-from Entity.entity import *
-from Components.graphics import *
-from Entity.Particle import *
+from Entity.entity import Entity
+from Components.graphics import ExplosionGraphics
+from Components.collider import ColliderComponent
+from Entity.Particle import Particle
 from Util.constants import ASSET_FILE_PATH
+from pygame import mixer, Rect, image, transform
 
 
 class Player(Entity):
@@ -18,15 +20,15 @@ class Player(Entity):
         self.canJump = True
         self.invincibility = 0
         self.jumpSound = [
-            pygame.mixer.Sound(f"{ASSET_FILE_PATH}/sound/Jump2_01.wav"),
-            pygame.mixer.Sound(f"{ASSET_FILE_PATH}/sound/Jump_01.wav")
+            mixer.Sound(f"{ASSET_FILE_PATH}/sound/Jump2_01.wav"),
+            mixer.Sound(f"{ASSET_FILE_PATH}/sound/Jump_01.wav")
         ]
-        self.slashSound = pygame.mixer.Sound(
+        self.slashSound = mixer.Sound(
             f"{ASSET_FILE_PATH}/sound/Sword_01.wav")
-        self.SpriteSheet = pygame.image.load(
+        self.SpriteSheet = image.load(
             f"{ASSET_FILE_PATH}/sprites/adventurer-Sheet.png").convert_alpha()
         self.directionFacing = 1
-        self.hurtRect = pygame.Rect(self.rect)
+        self.hurtRect = Rect(self.rect)
         self.canHurt = False
 
         self.AnimationStates = {}
@@ -35,6 +37,10 @@ class Player(Entity):
 
         self.Animation = self.AnimationStates["idle"]
         self.hits = {}
+
+        self.components["collider"] = ColliderComponent(20, 45)
+        self.components["collider"].static = False
+        self.components["collider"].collision_rect.topleft = self.x, self.y
 
     def initializeAnimations(self):
 
@@ -79,10 +85,11 @@ class Player(Entity):
     def setAnimation(self, key, frames):
         self.AnimationStates[key] = []
         for frame in frames:
-            self.AnimationStates[key].append(pygame.transform.scale2x(
+            self.AnimationStates[key].append(transform.scale2x(
                 self.SpriteSheet.subsurface(frame)).copy())
 
     def renew(self, world):
+        return
 
         if not self.canHurt:
             for entity in world.entities:

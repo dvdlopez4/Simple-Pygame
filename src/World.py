@@ -1,21 +1,18 @@
 import os
 import pygame
 import json
-from Components.physics import *
-from Entity.DumbBot import *
-from Entity.Player.player import *
-from Components.graphics import *
-from math import *
-from Entity.Wall import *
-from Entity.EndBlock import *
-from Entity.Bot import *
-from Components.KeyBoardInput import *
-from Components.GamePadInput import *
-from pygame.locals import *
-from Camera import *
-from Level import *
-from Entity.Particle import *
-import random
+
+from Components.physics import PhysicsComponent
+from Entity.DumbBot import DumbBot
+from Entity.Player.player import Player
+from Components.graphics import GraphicsComponent, ExplosionGraphics, EndGraphics, PlayerGraphics
+from Entity.Wall import Wall
+from Entity.EndBlock import EndBlock
+from Entity.Bot import Bot
+from Components.KeyBoardInput import KeyBoardInput
+from Camera import Camera
+from Level import Level
+from Entity.Particle import Particle
 from Util.constants import ASSET_FILE_PATH, SCREEN_WIDTH, SCREEN_HEIGHT, ROOMS
 
 PLAY_STATE = 0
@@ -52,11 +49,13 @@ class World(object):
             stick.init()
 
         self.loadAssets()
-        player = Player(KeyBoardInput(), PhysicsComponent(
-            self), PlayerGraphics(self.screen))
+        player = Player(KeyBoardInput(), PhysicsComponent(),
+                        PlayerGraphics(self.screen))
         self.addEntity(player)
         for player in self.players:
-            player.rect.center = self.start
+            # player.rect.center = self.start
+            player.x = self.start[0]
+            player.y = self.start[1]
 
         self.camera = Camera(760, 800)
         self.game_state = PLAY_STATE
@@ -81,9 +80,9 @@ class World(object):
                     self.start = x, y
 
                 if char == 'b':
-                    bot = Bot(DumbBot(self), PhysicsComponent(self),
+                    bot = Bot(DumbBot(self), PhysicsComponent(),
                               GraphicsComponent(self.screen, enemyImage))
-                    bot.rect.center = x, y
+                    bot.x, bot.y = x, y
                     self.addEntity(bot)
 
                 x += square
@@ -164,8 +163,8 @@ class World(object):
 
             elif self.game_state == RESTART_STATE:
                 self.loadLevel()
-                player = Player(KeyBoardInput(), PhysicsComponent(
-                    self), PlayerGraphics(self.screen))
+                player = Player(KeyBoardInput(), PhysicsComponent(),
+                                PlayerGraphics(self.screen))
                 player.rect.center = self.start
                 self.addEntity(player)
                 self.score = 0
@@ -199,6 +198,7 @@ class World(object):
         while self.lag >= self.MS_PER_UPDATE:
             for e in self.entities:
                 e.update(time)
+                e.update_components(self)
             self.lag -= self.MS_PER_UPDATE
 
     def render(self):
@@ -242,7 +242,7 @@ class World(object):
 
         # Remove players that have fallen through the map
         for player in self.players:
-            if player.rect.y < HEIGHT_THRESHOLD and player.health > 0:
+            if player.y < HEIGHT_THRESHOLD and player.health > 0:
                 continue
 
             self.players.remove(player)
@@ -252,7 +252,8 @@ class World(object):
             self.loadLevel()
             self.score += POINTS_PER_LEVEL
             for player in self.players:
-                player.rect.center = self.start
+                player.x = self.start[0]
+                player.y = self.start[1]
                 self.entities.append(player)
 
     def addEntity(self, Entity):

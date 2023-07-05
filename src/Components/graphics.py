@@ -1,4 +1,5 @@
 import pygame
+from Entity.entity import Entity
 
 
 class GraphicsComponent(object):
@@ -6,24 +7,27 @@ class GraphicsComponent(object):
         self.screen = screen
         self.image = image
 
-    def update(self, Entity, camera):
+    def update(self, Entity: Entity, camera):
         if self.image != None:
-            newImage = pygame.transform.scale(self.image, (Entity.rect.w, Entity.rect.h))
+            newImage = pygame.transform.scale(
+                self.image, (Entity.rect.w, Entity.rect.h))
             self.screen.blit(newImage, camera.apply(Entity))
         else:
-            pygame.draw.rect(self.screen, (200, 200, 240), camera.apply(Entity), 0)
+            pygame.draw.rect(self.screen, (200, 200, 240),
+                             camera.apply(Entity), 0)
+
 
 class PlayerGraphics(object):
     def __init__(self, screen):
         self.screen = screen
-        self.color = (255,150,255)
+        self.color = (255, 150, 255)
         self.count = 5
 
     def update(self, Entity, camera):
         if Entity.invincibility:
-            self.color = (255,50,50)
+            self.color = (255, 50, 50)
         else:
-            self.color = (255,150,255)
+            self.color = (255, 150, 255)
         position = camera.apply(Entity)
         if Entity.frameIndex > len(Entity.Animation) - 1:
             Entity.frameIndex = 0
@@ -31,7 +35,8 @@ class PlayerGraphics(object):
         rect.center = position.center
         rect.bottom = position.bottom
         if Entity.directionFacing < 0:
-            self.screen.blit(pygame.transform.flip(Entity.Animation[Entity.frameIndex], True, False), rect)
+            self.screen.blit(pygame.transform.flip(
+                Entity.Animation[Entity.frameIndex], True, False), rect)
         else:
             self.screen.blit(Entity.Animation[Entity.frameIndex], rect)
         pygame.draw.rect(self.screen, (255, 0, 0), camera.apply(Entity), 2)
@@ -118,17 +123,20 @@ class ExplosionGraphics(object):
 
     def update(self, Entity, camera):
         if self.frame != len(self.explosionFrames) - 1:
-            self.screen.blit(self.explosionFrames[self.frame], camera.apply(Entity))
+            self.screen.blit(
+                self.explosionFrames[self.frame], camera.apply(Entity))
             self.frame += 1
         else:
             Entity.isDone = True
+
 
 class EndGraphics(object):
     def __init__(self, screen):
         self.screen = screen
 
     def update(self, Entity, camera):
-        pygame.draw.rect(self.screen, (255,255,0), camera.apply(Entity), 1)
+        pygame.draw.rect(self.screen, (255, 255, 0), camera.apply(Entity), 1)
+
 
 class BotGraphics(object):
     def __init__(self, screen):

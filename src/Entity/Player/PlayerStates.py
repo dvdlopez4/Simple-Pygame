@@ -3,6 +3,20 @@ import numpy as np
 import random
 
 
+def is_on_the_ground(Entity):
+    if Entity.physics is None:
+        return True
+
+    return Entity.physics.isOnGround
+
+
+def set_ground_status(Entity, status):
+    if Entity.physics is None:
+        return
+
+    Entity.physics.isOnGround = status
+
+
 class StandingState(object):
     def __init__(self):
         self.isJumpPressed = False
@@ -16,7 +30,7 @@ class StandingState(object):
         if Input.Buttons[Input.Actions["Right"]] or Input.Buttons[Input.Actions["Left"]]:
             return RunningState()
 
-        if (Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]]) or not Entity.isOnGround:
+        if (Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]]) or not is_on_the_ground(Entity):
             return JumpState()
 
         if Input.Buttons[Input.Actions["Dash"]] and not self.ButtonsReleased[Input.Actions["Dash"]]:
@@ -49,10 +63,10 @@ class RunningState(object):
         if Input.Buttons[Input.Actions["Attack"]] and not self.ButtonsReleased[Input.Actions["Attack"]]:
             return AttackState()
 
-        if (not Input.Buttons[Input.Actions["Left"]] and not Input.Buttons[Input.Actions["Right"]]) and Entity.isOnGround:
+        if (not Input.Buttons[Input.Actions["Left"]] and not Input.Buttons[Input.Actions["Right"]]) and is_on_the_ground(Entity):
             return StandingState()
 
-        if (Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]]) or not Entity.isOnGround:
+        if (Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]]) or not is_on_the_ground(Entity):
             return JumpState()
 
         if Input.Buttons[Input.Actions["Dash"]] and not self.ButtonsReleased[Input.Actions["Dash"]]:
@@ -64,7 +78,7 @@ class RunningState(object):
         if Input.Buttons[Input.Actions["Right"]]:
             Entity.directionFacing = 1
 
-        Entity.velocity[0] = (Entity.directionFacing * 150)
+        Entity.physics.velocity[0] = (Entity.directionFacing * 150)
 
         self.ButtonsReleased = Input.GetButtons()
         return None
@@ -94,7 +108,7 @@ class DashState(object):
 
         if self.DashFrames <= 0:
             Entity.canDash = False
-            if Entity.isOnGround:
+            if is_on_the_ground(Entity):
                 if Input.Buttons[Input.Actions["Right"]] or Input.Buttons[Input.Actions["Left"]]:
                     return RunningState()
 
@@ -106,8 +120,8 @@ class DashState(object):
         return None
 
     def update(self, Entity):
-        Entity.velocity[0] = self.velocity[0]
-        Entity.velocity[1] = self.velocity[1]
+        Entity.physics.velocity[0] = self.velocity[0]
+        Entity.physics.velocity[1] = self.velocity[1]
 
     def exit(self, Entity, Input):
         Entity.rect.h = 45
@@ -130,36 +144,36 @@ class JumpState(object):
 
         if Input.Buttons[Input.Actions["Left"]]:
             Entity.directionFacing = -1
-            Entity.velocity[0] = -150
+            Entity.physics.velocity[0] = -150
 
         if Input.Buttons[Input.Actions["Right"]]:
             Entity.directionFacing = 1
-            Entity.velocity[0] = 150
+            Entity.physics.velocity[0] = 150
 
-        if Entity.isOnGround:
+        if is_on_the_ground(Entity):
             return StandingState()
 
         if Input.Buttons[Input.Actions["Dash"]] and not self.ButtonsReleased[Input.Actions["Dash"]] and Entity.canDash:
             return DashState()
 
         if self.jumps > 0 and Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]]:
-            Entity.isOnGround = True
+            set_ground_status(Entity, True)
             Entity.jumpSound[random.randint(0, 1)].play()
             Entity.Animation = Entity.AnimationStates["jumping"]
             self.jumps -= 1
 
         self.ButtonsReleased = Input.GetButtons()
-        if Entity.velocity[1] < 0 and not self.ButtonsReleased[Input.Actions["Jump"]]:
-            Entity.velocity[1] *= 0.35
+        if Entity.physics.velocity[1] < 0 and not self.ButtonsReleased[Input.Actions["Jump"]]:
+            Entity.physics.velocity[1] *= 0.35
 
         return None
 
     def update(self, Entity):
-        if Entity.isOnGround:
+        if is_on_the_ground(Entity):
             Entity.jumpSound[random.randint(0, 1)].play()
-            Entity.velocity[1] = -450
+            Entity.physics.velocity[1] = -450
 
-        if Entity.velocity[1] > 0:
+        if Entity.physics.velocity[1] > 0:
             Entity.Animation = Entity.AnimationStates["falling"]
 
     def exit(self, Entity, Input):
@@ -182,10 +196,10 @@ class AttackState(object):
 
     def update(self, Entity):
         Entity.invincibility = 1
-        Entity.velocity[1] = 0
+        Entity.physics.velocity[1] = 0
         if Entity.frameIndex == len(Entity.AnimationStates) - 3:
             Entity.canHurt = True
-            Entity.velocity[0] = (Entity.directionFacing * 50)
+            Entity.physics.velocity[0] = (Entity.directionFacing * 50)
 
     def exit(self, Entity, Input):
         Entity.canHurt = False

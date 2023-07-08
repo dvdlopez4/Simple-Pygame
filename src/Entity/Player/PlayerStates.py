@@ -124,12 +124,12 @@ class DashState(object):
         Entity.physics.velocity[1] = self.velocity[1]
 
     def exit(self, Entity, Input):
-        Entity.rect.h = 45
+        Entity.h = 45
 
     def enter(self, Entity, Input):
         Entity.Animation = Entity.AnimationStates["dashing"]
-        Entity.rect.centery += 25
-        Entity.rect.h = 5
+        Entity.centery += 25
+        Entity.h = 5
         self.velocity = [(Entity.directionFacing * 450), 0]
 
 
@@ -163,8 +163,6 @@ class JumpState(object):
             self.jumps -= 1
 
         self.ButtonsReleased = Input.GetButtons()
-        if Entity.physics.velocity[1] < 0 and not self.ButtonsReleased[Input.Actions["Jump"]]:
-            Entity.physics.velocity[1] *= 0.35
 
         return None
 
@@ -196,10 +194,8 @@ class AttackState(object):
 
     def update(self, Entity):
         Entity.invincibility = 1
-        Entity.physics.velocity[1] = 0
         if Entity.frameIndex == len(Entity.AnimationStates) - 3:
             Entity.canHurt = True
-            Entity.physics.velocity[0] = (Entity.directionFacing * 50)
 
     def exit(self, Entity, Input):
         Entity.canHurt = False

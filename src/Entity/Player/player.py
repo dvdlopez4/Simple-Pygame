@@ -1,7 +1,5 @@
 from Entity.entity import Entity
-from Components.graphics import ExplosionGraphics
 from Components.collider import ColliderComponent
-from Entity.Particle import Particle
 from Util.constants import ASSET_FILE_PATH
 from pygame import mixer, Rect, image, transform
 
@@ -9,10 +7,9 @@ from pygame import mixer, Rect, image, transform
 class Player(Entity):
     def __init__(self, _input, _physics, _graphics):
         super(Player, self).__init__(_input, _physics, _graphics)
-        self.rect.center = 0, 0
-        self.rect.w = 20
-        self.rect.h = 45
-        self.mass = 1
+        self.center = 0, 0
+        self.w = 20
+        self.h = 45
         self.ID = -1
         self.health = self.maxHealth = 3
         self.state = None
@@ -28,7 +25,7 @@ class Player(Entity):
         self.SpriteSheet = image.load(
             f"{ASSET_FILE_PATH}/sprites/adventurer-Sheet.png").convert_alpha()
         self.directionFacing = 1
-        self.hurtRect = Rect(self.rect)
+        self.hurtRect = Rect(self)
         self.canHurt = False
 
         self.AnimationStates = {}
@@ -38,7 +35,7 @@ class Player(Entity):
         self.Animation = self.AnimationStates["idle"]
         self.hits = {}
 
-        self.components["collider"] = ColliderComponent(20, 45)
+        self.components["collider"] = ColliderComponent(self.w, self.h)
         self.components["collider"].static = False
         self.components["collider"].collision_rect.topleft = self.x, self.y
 
@@ -91,33 +88,9 @@ class Player(Entity):
     def renew(self, world):
         return
 
-        if not self.canHurt:
-            for entity in world.entities:
-                self.hits[entity] = False
+    def set_center(self, center):
+        self.center = center
+        if "collider" not in self.components:
             return
 
-        self.hurtRect.centerx = self.rect.centerx + (self.directionFacing * 30)
-        self.hurtRect.centery = self.rect.centery - 14
-        self.hurtRect.w = 30
-        self.hurtRect.h = 10
-        for entity in world.entities:
-            if entity == self:
-                continue
-            if not self.hurtRect.colliderect(entity.rect):
-                continue
-            if self.hits[entity]:
-                continue
-
-            self.hits[entity] = True
-            entity.health -= 1
-            entity.rect.left = self.hurtRect.right
-            entity.velocity[0] = (self.directionFacing * 2000)
-
-            if self.directionFacing < 0:
-                entity.rect.right = self.hurtRect.left
-
-            entity.velocity[1] = -150
-            particle = Particle(None, None, ExplosionGraphics(
-                world.screen, world.explosion))
-            particle.rect.center = self.rect.centerx - 15, self.rect.centery - 50
-            world.particles.append(particle)
+        self.components["collider"].collision_rect.center = center

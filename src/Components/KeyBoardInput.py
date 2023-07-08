@@ -1,5 +1,5 @@
 import pygame
-from Entity.Player.PlayerStates import *
+from Entity.Player.PlayerStates import StandingState
 
 
 class KeyBoardInput(object):
@@ -18,16 +18,11 @@ class KeyBoardInput(object):
 
     def update(self, Entity):
         self.Buttons = self.GetButtons()
-        if Entity.invincibility:
-            Entity.invincibility -= 1
 
-        if Entity.invincibility > 45:
-            return
-
-        Entity.state = self.state_.handleInput(Entity, self)
-        if Entity.state != None:
+        current_state = self.state_.handleInput(Entity, self)
+        if current_state is not None:
             self.state_.exit(Entity, self)
-            self.state_ = Entity.state
+            self.state_ = current_state
             self.state_.enter(Entity, self)
 
         self.state_.update(Entity)

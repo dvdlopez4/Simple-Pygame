@@ -1,15 +1,18 @@
-from Entity.entity import *
-import pygame
+from Entity.entity import Entity
+
 
 class EndBlock(Entity):
     """docstring for EndBlock"""
+
     def __init__(self, x, y, w, h):
         super(EndBlock, self).__init__(None, None, None)
-        self.rect = pygame.Rect(x, y, w, h)
-        self.health = 100
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
 
     def check(self, player):
-        if player.rect.colliderect(self.rect):
+        if player.colliderect(self):
             return True
-        
+
         return False

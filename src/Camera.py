@@ -8,8 +8,7 @@ class Camera(object):
         self.height = height
 
     def apply(self, entity):
-        rect = pygame.Rect(entity.x, entity.y, 20, 45)
-        return rect.move(self.camera.topleft)
+        return entity.move(self.camera.topleft)
 
     def update(self, targets):
         if len(targets):

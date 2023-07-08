@@ -16,11 +16,9 @@ class Level(object):
 
         return direction
 
-    def createPath(self):
+    def createPath(self, size):
         (ChooseStartState, AdjacentRoomState, NextFloorState) = (1, 2, 3)
-        size = len(self.Layout[0]) - 1
-        if not size:
-            return 0
+
         height = len(self.Layout) - 1
         room = 0
         state = ChooseStartState
@@ -50,8 +48,13 @@ class Level(object):
 
             self.Layout[floor][int(room)] = roomType
 
-    def generateLines(self, rooms):
+    def generate_as_text(self, rooms):
         mapLines = []
+        size = len(self.Layout[0]) - 1
+        if size <= 0:
+            return mapLines
+
+        self.createPath(size)
         for floor in self.Layout:
             lines = np.zeros(len(rooms[0][0])).tolist()
             lines = list(map(lambda x: "w", lines))

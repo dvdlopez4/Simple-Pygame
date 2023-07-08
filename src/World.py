@@ -2,18 +2,14 @@ import os
 import pygame
 import json
 
+from Util.constants import ASSET_FILE_PATH, SCREEN_WIDTH, SCREEN_HEIGHT
 from Components.physics import PhysicsComponent
-from Entity.DumbBot import DumbBot
 from Entity.Player.player import Player
-from Components.graphics import GraphicsComponent, EndGraphics, PlayerGraphics
-from Entity.Wall import Wall
-from Entity.EndBlock import EndBlock
-from Entity.Bot import Bot
+from Components.graphics import PlayerGraphics
 from Components.KeyBoardInput import KeyBoardInput
 from Camera import Camera
-from Level import Level
-from Util.constants import ASSET_FILE_PATH, SCREEN_WIDTH, SCREEN_HEIGHT, ROOMS
 from GameStates import PlayState
+from LevelUtils import load_level
 
 
 HEIGHT_THRESHOLD = 1320
@@ -63,50 +59,7 @@ class World(object):
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.camera = Camera(SCREEN_WIDTH * 1.5, HEIGHT_THRESHOLD)
 
-    def createLevel(self, x, y):
-        SQUARE_DIMENSION = 40
-        enemyImage = pygame.image.load(
-            f'{ASSET_FILE_PATH}sprites/enemy.png').convert_alpha()
-        for row in self.CurrentLevel:
-            for char in row:
-                if char == 'w':
-                    self.platforms.append(Wall(None, None, GraphicsComponent(
-                        self.screen, None), x, y, SQUARE_DIMENSION, SQUARE_DIMENSION))
-
-                if char == 'e':
-                    self.end = EndBlock(
-                        x, y, SQUARE_DIMENSION, SQUARE_DIMENSION)
-                    self.end.graphics = EndGraphics(self.screen)
-                    self.addEntity(self.end)
-
-                if char == 's':
-                    self.start = x, y
-
-                if char == 'b':
-                    bot = Bot(DumbBot(self), PhysicsComponent(),
-                              GraphicsComponent(self.screen, enemyImage))
-                    bot.x, bot.y = x, y
-                    self.addEntity(bot)
-
-                x += SQUARE_DIMENSION
-            y += SQUARE_DIMENSION
-            x = SQUARE_DIMENSION
-
-    def loadLevel(self):
-
-        lvl = Level((LEVEL_HEIGHT, LEVEL_WIDTH))
-        lvl.createPath()
-        level = lvl.generateLines(ROOMS)
-
-        self.CurrentLevel = level
-        self.entities.clear()
-        self.players.clear()
-        self.platforms.clear()
-
-        self.createLevel(0, 0)
-
     def loadAssets(self):
-
         f = open(f'{ASSET_FILE_PATH}/data/data.json', "r")
         self.data = json.load(f)
         f.close()
@@ -116,7 +69,7 @@ class World(object):
         self.image = pygame.transform.scale(
             rawImage, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-        self.loadLevel()
+        load_level(self)
         for player in self.players:
             player.set_center(self.start)
 
@@ -189,7 +142,7 @@ class World(object):
                 continue
 
             # At least one player reached the end of the level
-            self.loadLevel()
+            load_level(self)
             self.score += POINTS_PER_LEVEL
             player.set_center(self.start)
             player.is_active = True

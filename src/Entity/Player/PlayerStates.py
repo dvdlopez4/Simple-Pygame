@@ -1,4 +1,3 @@
-import pygame
 import numpy as np
 import random
 
@@ -194,6 +193,7 @@ class AttackState(object):
 
     def update(self, Entity):
         Entity.invincibility = 1
+        Entity.physics.velocity[1] = 0
         if Entity.frameIndex == len(Entity.AnimationStates) - 3:
             Entity.canHurt = True
 

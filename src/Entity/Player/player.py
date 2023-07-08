@@ -1,5 +1,4 @@
 from Entity.entity import Entity
-from Components.collider import ColliderComponent
 from Util.constants import ASSET_FILE_PATH
 from pygame import mixer, Rect, image, transform
 
@@ -34,10 +33,6 @@ class Player(Entity):
 
         self.Animation = self.AnimationStates["idle"]
         self.hits = {}
-
-        self.components["collider"] = ColliderComponent(self.w, self.h)
-        self.components["collider"].static = False
-        self.components["collider"].collision_rect.topleft = self.x, self.y
 
     def initializeAnimations(self):
 
@@ -90,7 +85,3 @@ class Player(Entity):
 
     def set_center(self, center):
         self.center = center
-        if "collider" not in self.components:
-            return
-
-        self.components["collider"].collision_rect.center = center

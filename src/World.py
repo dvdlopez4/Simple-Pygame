@@ -13,19 +13,15 @@ from Components.KeyBoardInput import KeyBoardInput
 from Camera import Camera
 from Level import Level
 from Util.constants import ASSET_FILE_PATH, SCREEN_WIDTH, SCREEN_HEIGHT, ROOMS
+from GameStates import PlayState
 
-PLAY_STATE = 0
-START_MENU_STATE = 1
-PAUSE_STATE = 2
-GAME_OVER_STATE = 3
-RESTART_STATE = 4
 
 HEIGHT_THRESHOLD = 1320
 POINTS_PER_LEVEL = 100
 MS_PER_UPDATE = 16
 
 LEVEL_WIDTH = 3
-LEVEL_HEIGHT = 3
+LEVEL_HEIGHT = 6
 
 
 class World(object):
@@ -49,7 +45,7 @@ class World(object):
         for player in self.players:
             player.set_center(self.start)
 
-        self.game_state = PLAY_STATE
+        self.game_state = PlayState()
         self.clock = pygame.time.Clock()
 
     def get_controllers(self):
@@ -100,11 +96,11 @@ class World(object):
 
         lvl = Level((LEVEL_WIDTH, LEVEL_HEIGHT))
         lvl.createPath()
-
         level = lvl.generateLines(ROOMS)
 
         self.CurrentLevel = level
         self.entities.clear()
+        self.players.clear()
         self.platforms.clear()
 
         self.createLevel(0, 0)
@@ -115,18 +111,17 @@ class World(object):
         self.data = json.load(f)
         f.close()
 
-        self.loadLevel()
         rawImage = pygame.image.load(
             f'{ASSET_FILE_PATH}/background/game_background_4.png').convert()
         self.image = pygame.transform.scale(
             rawImage, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
+        self.loadLevel()
         for player in self.players:
             player.set_center(self.start)
 
     def run(self):
-        running = True
-        while running:
+        while True:
             pygame.display.set_caption("{:.2f}".format(self.clock.get_fps()))
 
             key_events = []
@@ -136,41 +131,9 @@ class World(object):
             if len(key_events) > 0 and key_events[0].type == pygame.KEYDOWN and key_events[0].key == pygame.K_ESCAPE:
                 break
 
-            if (self.game_state == PLAY_STATE):
-                self.input()
-                self.physics()
-                self.camera.update(self.players)
-                self.render()
-                self.logic()
-
-                if len(key_events) > 0 and key_events[0].type == pygame.KEYDOWN and key_events[0].key == pygame.K_p:
-                    self.game_state = PAUSE_STATE
-                elif len(list(filter(lambda p: p.is_active, self.players))) == 0:
-                    self.game_state = GAME_OVER_STATE
-
-            elif self.game_state == PAUSE_STATE:
-                if len(key_events) > 0 and key_events[0].type == pygame.KEYDOWN and key_events[0].key == pygame.K_p:
-                    self.game_state = PLAY_STATE
-
-                pygame.mixer.pause()
-
-            elif self.game_state == GAME_OVER_STATE:
-                label = self.myfont.render(
-                    "Game Over", 1, (255, 255, 255))
-                self.screen.blit(
-                    label, (SCREEN_WIDTH // 2 - label.get_rect().right, SCREEN_HEIGHT // 2 - label.get_rect().h))
-
-                if len(key_events) > 0 and key_events[0].type == pygame.KEYDOWN and key_events[0].key == pygame.K_RETURN:
-                    self.game_state = RESTART_STATE
-
-            elif self.game_state == RESTART_STATE:
-                self.loadLevel()
-                for player in self.players:
-                    player.set_center(self.start)
-                    player.is_active = True
-
-                self.score = 0
-                self.game_state = PLAY_STATE
+            current_game_state = self.game_state.update(self, key_events)
+            if current_game_state is not None:
+                self.game_state = current_game_state
 
             scoreboard = self.myfont.render(
                 "{:.0f}".format(self.score), 1, (255, 255, 255))
@@ -203,10 +166,37 @@ class World(object):
         for platform in self.platforms:
             platform.render(self.camera)
 
+        self.ui()
+
     def logic(self):
         if len(self.players) == 0:
             return
 
+        for player in self.players:
+            # Remove players that have fallen through the map
+            if player.y >= HEIGHT_THRESHOLD:
+                player.is_active = False
+
+            if player.health <= 0:
+                player.is_active = False
+
+            # Ignore players that are inactive for any other reason
+            if not player.is_active:
+                continue
+
+            # Player reached the end of the level, go to the next level
+            if not self.end.check(player):
+                continue
+
+            # At least one player reached the end of the level
+            self.loadLevel()
+            self.score += POINTS_PER_LEVEL
+            player.set_center(self.start)
+            player.is_active = True
+            self.addEntity(player)
+            break
+
+    def ui(self):
         SURFACE = self.screen
         HEALTH_BORDER_COLOR_WHITE = (255, 255, 255)
         HEALTH_FILL_COLOR_RED = (255, 0, 0)
@@ -227,22 +217,6 @@ class World(object):
             pygame.draw.rect(SURFACE, HEALTH_FILL_COLOR_RED, HEALTH_BAR_RECT)
             pygame.draw.rect(SURFACE, HEALTH_BORDER_COLOR_WHITE,
                              HEALTH_BAR_RECT, BORDER_RADIUS)
-
-        # Remove players that have fallen through the map
-        for player in self.players:
-            if player.y < HEIGHT_THRESHOLD and player.health > 0:
-                continue
-
-            player.is_active = False
-
-        # Player reached the end of the level, go to the next level
-        if len(self.players) and self.end.check(self.players[0]):
-            self.loadLevel()
-            self.score += POINTS_PER_LEVEL
-
-            for player in self.players:
-                player.set_center(self.start)
-                player.is_active = True
 
     def addEntity(self, Entity):
         if type(Entity) == Player:

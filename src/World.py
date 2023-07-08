@@ -20,8 +20,8 @@ HEIGHT_THRESHOLD = 1320
 POINTS_PER_LEVEL = 100
 MS_PER_UPDATE = 16
 
-LEVEL_WIDTH = 3
-LEVEL_HEIGHT = 6
+LEVEL_WIDTH = 6
+LEVEL_HEIGHT = 3
 
 
 class World(object):
@@ -61,7 +61,7 @@ class World(object):
         self.score = 0
         pygame.display.set_caption("Simple Game")
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        self.camera = Camera(760, 800)
+        self.camera = Camera(SCREEN_WIDTH * 1.5, HEIGHT_THRESHOLD)
 
     def createLevel(self, x, y):
         SQUARE_DIMENSION = 40
@@ -94,7 +94,7 @@ class World(object):
 
     def loadLevel(self):
 
-        lvl = Level((LEVEL_WIDTH, LEVEL_HEIGHT))
+        lvl = Level((LEVEL_HEIGHT, LEVEL_WIDTH))
         lvl.createPath()
         level = lvl.generateLines(ROOMS)
 

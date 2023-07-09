@@ -15,41 +15,25 @@ class GraphicsComponent(object):
         else:
             pygame.draw.rect(self.screen, (200, 200, 240),
                              camera.apply(Entity), 0)
-            if "collider" not in Entity.components:
-                return
-
-            pygame.draw.rect(self.screen, (0, 255, 0), camera.apply(
-                Entity.components["collider"].collision_rect), 1)
 
 
 class PlayerGraphics(object):
     def __init__(self, screen):
         self.screen = screen
-        self.color = (255, 150, 255)
-        self.count = 5
 
-    def update(self, Entity, camera):
+    def update(self, Entity: Entity, camera):
         position = camera.apply(Entity)
-        if Entity.frameIndex > len(Entity.Animation) - 1:
-            Entity.frameIndex = 0
+        if "Animation" not in Entity.components:
+            return
 
-        rect = Entity.Animation[Entity.frameIndex].get_rect()
+        animation_frame = Entity.components["Animation"].get_next_frame(
+            Entity, position)
+
+        rect = animation_frame.get_rect()
         rect.center = position.center
         rect.bottom = position.bottom
 
-        if Entity.directionFacing < 0:
-            self.screen.blit(pygame.transform.flip(
-                Entity.Animation[Entity.frameIndex], True, False), rect)
-        else:
-            self.screen.blit(Entity.Animation[Entity.frameIndex], rect)
-
-        pygame.draw.rect(self.screen, (255, 0, 0), camera.apply(Entity), 1)
-
-        if self.count <= 0:
-            self.count = 5
-            Entity.frameIndex += 1
-
-        self.count -= 1
+        self.screen.blit(animation_frame, rect)
 
 
 class ExplosionGraphics(object):

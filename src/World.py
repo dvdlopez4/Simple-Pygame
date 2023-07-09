@@ -39,7 +39,7 @@ class World(object):
                         PlayerGraphics(self.screen))
         self.addEntity(player)
         for player in self.players:
-            player.set_center(self.start)
+            player.center = self.start
 
         self.game_state = PlayState()
         self.clock = pygame.time.Clock()
@@ -54,12 +54,12 @@ class World(object):
 
     def initialize_screen(self):
         self.myfont = pygame.font.SysFont("monospace", 34, bold=True)
-        self.score = 0
         pygame.display.set_caption("Simple Game")
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.camera = Camera(SCREEN_WIDTH * 1.5, HEIGHT_THRESHOLD)
 
     def loadAssets(self):
+        self.score = 0
         rawImage = pygame.image.load(
             f'{ASSET_FILE_PATH}/background/game_background_4.png').convert()
         self.image = pygame.transform.scale(
@@ -67,7 +67,7 @@ class World(object):
 
         load_level(self)
         for player in self.players:
-            player.set_center(self.start)
+            player.center = self.start
 
     def run(self):
         while True:
@@ -140,7 +140,7 @@ class World(object):
             # At least one player reached the end of the level
             load_level(self)
             self.score += POINTS_PER_LEVEL
-            player.set_center(self.start)
+            player.center = self.start
             player.is_active = True
             self.addEntity(player)
             break

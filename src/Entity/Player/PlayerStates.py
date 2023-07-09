@@ -47,7 +47,9 @@ class StandingState(object):
 
     def enter(self, Entity, Input):
         self.ButtonsReleased = Input.GetButtons()
-        Entity.Animation = Entity.AnimationStates["idle"]
+        if "Animation" in Entity.components:
+            Entity.components["Animation"].set_animation_state("idle")
+
         Entity.canDash = True
         Entity.canJump = True
 
@@ -89,7 +91,8 @@ class RunningState(object):
         pass
 
     def enter(self, Entity, Input):
-        Entity.Animation = Entity.AnimationStates["running"]
+        if "Animation" in Entity.components:
+            Entity.components["Animation"].set_animation_state("running")
         self.ButtonsReleased = Input.GetButtons()
 
 
@@ -126,7 +129,9 @@ class DashState(object):
         Entity.h = 45
 
     def enter(self, Entity, Input):
-        Entity.Animation = Entity.AnimationStates["dashing"]
+        if "Animation" in Entity.components:
+            Entity.components["Animation"].set_animation_state("dashing")
+
         Entity.centery += 25
         Entity.h = 5
         self.velocity = [(Entity.directionFacing * 450), 0]
@@ -158,7 +163,9 @@ class JumpState(object):
         if self.jumps > 0 and Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]]:
             set_ground_status(Entity, True)
             Entity.jumpSound[random.randint(0, 1)].play()
-            Entity.Animation = Entity.AnimationStates["jumping"]
+            if "Animation" in Entity.components:
+                Entity.components["Animation"].set_animation_state("jumping")
+
             self.jumps -= 1
 
         self.ButtonsReleased = Input.GetButtons()
@@ -171,13 +178,16 @@ class JumpState(object):
             Entity.physics.velocity[1] = -450
 
         if Entity.physics.velocity[1] > 0:
-            Entity.Animation = Entity.AnimationStates["falling"]
+            if "Animation" in Entity.components:
+                Entity.components["Animation"].set_animation_state("falling")
 
     def exit(self, Entity, Input):
         pass
 
     def enter(self, Entity, Input):
-        Entity.Animation = Entity.AnimationStates["jumping"]
+        if "Animation" in Entity.components:
+            Entity.components["Animation"].set_animation_state("jumping")
+
         self.ButtonsReleased = Input.GetButtons()
 
 
@@ -186,7 +196,7 @@ class AttackState(object):
         self.ButtonsReleased = np.zeros((20,), dtype=int)
 
     def handleInput(self, Entity, Input):
-        if Entity.frameIndex == len(Entity.AnimationStates) - 1:
+        if Entity.components["Animation"].is_on_last_frame():
             return StandingState()
 
         return None
@@ -194,14 +204,14 @@ class AttackState(object):
     def update(self, Entity):
         Entity.invincibility = 1
         Entity.physics.velocity[1] = 0
-        if Entity.frameIndex == len(Entity.AnimationStates) - 3:
-            Entity.canHurt = True
 
     def exit(self, Entity, Input):
         Entity.canHurt = False
         Entity.invincibility = 0
 
     def enter(self, Entity, Input):
-        Entity.Animation = Entity.AnimationStates["attacking"]
+        if "Animation" in Entity.components:
+            Entity.components["Animation"].set_animation_state("attacking")
+            Entity.components["Animation"].frameIndex = 0
+
         Entity.slashSound.play()
-        Entity.frameIndex = 0

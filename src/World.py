@@ -60,10 +60,6 @@ class World(object):
         self.camera = Camera(SCREEN_WIDTH * 1.5, HEIGHT_THRESHOLD)
 
     def loadAssets(self):
-        f = open(f'{ASSET_FILE_PATH}/data/data.json', "r")
-        self.data = json.load(f)
-        f.close()
-
         rawImage = pygame.image.load(
             f'{ASSET_FILE_PATH}/background/game_background_4.png').convert()
         self.image = pygame.transform.scale(

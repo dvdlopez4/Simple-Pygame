@@ -1,41 +1,42 @@
 from Entity.entity import Entity
 from Util.constants import ASSET_FILE_PATH
-from pygame import mixer, Rect, image, transform
+from pygame import mixer, image, transform
 
 
 class Player(Entity):
     def __init__(self, _input, _physics, _graphics):
         super(Player, self).__init__(_input, _physics, _graphics)
+        self.ID = -1
         self.center = 0, 0
         self.w = 20
         self.h = 45
-        self.ID = -1
-        self.health = self.maxHealth = 3
+
+        # Player Components?
         self.state = None
+        self.health = self.maxHealth = 3
         self.canDash = True
         self.canJump = True
         self.invincibility = 0
+        self.directionFacing = 1
+
+        # Sound Effects
         self.jumpSound = [
             mixer.Sound(f"{ASSET_FILE_PATH}/sound/Jump2_01.wav"),
             mixer.Sound(f"{ASSET_FILE_PATH}/sound/Jump_01.wav")
         ]
         self.slashSound = mixer.Sound(
             f"{ASSET_FILE_PATH}/sound/Sword_01.wav")
+
         self.SpriteSheet = image.load(
             f"{ASSET_FILE_PATH}/sprites/adventurer-Sheet.png").convert_alpha()
-        self.directionFacing = 1
-        self.hurtRect = Rect(self)
-        self.canHurt = False
 
+        # Animation Components?
         self.AnimationStates = {}
         self.frameIndex = 0
         self.initializeAnimations()
-
         self.Animation = self.AnimationStates["idle"]
-        self.hits = {}
 
     def initializeAnimations(self):
-
         runningFrames = [
             (67, 45, 20, 28),
             (116, 46, 20, 27),

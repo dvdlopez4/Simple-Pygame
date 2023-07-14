@@ -1,6 +1,5 @@
 import os
 import pygame
-import json
 
 from Util.constants import ASSET_FILE_PATH, SCREEN_WIDTH, SCREEN_HEIGHT
 from Components.physics import PhysicsComponent
@@ -27,8 +26,6 @@ class World(object):
         self.players = []
 
         os.environ["SDL_VIDEO_CENTERED"] = "1"
-        pygame.mixer.pre_init(44100, -16, 1, 512)
-        pygame.mixer.init()
         pygame.init()
 
         self.initialize_screen()

@@ -27,7 +27,8 @@ class PlayerGraphics(object):
             pygame.draw.rect(self.screen, (255, 0, 0), position, 1)
             return
 
-        animation_frame = Entity.components["Animation"].get_next_frame(Entity, position)
+        animation_frame = Entity.components["Animation"].get_next_frame(
+            Entity, position)
 
         rect = animation_frame.get_rect()
         rect.center = position.center
@@ -126,13 +127,3 @@ class EndGraphics(object):
 
     def update(self, Entity, camera):
         pygame.draw.rect(self.screen, (255, 255, 0), camera.apply(Entity), 1)
-
-
-class BotGraphics(object):
-    def __init__(self, screen):
-        self.screen = screen
-        self.area = True
-        self.red = 155
-
-    def update(self, Entity, camera):
-        pygame.draw.rect(self.screen, (200, 155, 155), camera.apply(Entity), 0)

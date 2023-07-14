@@ -102,6 +102,7 @@ class DashState(object):
     def __init__(self):
         self.DashFrames = 15
         self.velocity = [450, 0]
+        self.previous_player_dimensions = None
 
     def handleInput(self, Entity, Input):
         if Input.Buttons[Input.Actions["Attack"]]:
@@ -128,16 +129,20 @@ class DashState(object):
         Entity.physics.velocity[1] = self.velocity[1]
 
     def exit(self, Entity, Input):
-        Entity.h = 45
+        Entity.w, Entity.h = self.previous_player_dimensions
 
     def enter(self, Entity, Input):
         if "Animation" in Entity.components:
             Entity.components["Animation"].set_animation_state("dashing")
 
-        Entity.centery += 25
-        Entity.h = 5
-        self.velocity = [
-            (Entity.components["Animation"].directionFacing * 450), 0]
+        current_animation_rect = Entity.components["Animation"].get_current_animation_rect(
+        )
+
+        self.previous_player_dimensions = (Entity.w, Entity.h)
+        Entity.h = current_animation_rect.h
+        Entity.w = current_animation_rect.w // 3
+        Entity.y += current_animation_rect.h // 2
+        self.velocity[0] *= Entity.components["Animation"].directionFacing
 
 
 class JumpState(object):

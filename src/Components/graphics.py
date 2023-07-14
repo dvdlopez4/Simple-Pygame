@@ -24,14 +24,14 @@ class PlayerGraphics(object):
     def update(self, Entity: Entity, camera):
         position = camera.apply(Entity)
         if "Animation" not in Entity.components:
-            pygame.draw.rect(self.screen, (255, 0, 0), position, 1)
+            pygame.draw.rect(self.screen, (0, 255, 0), position, 1)
             return
 
         animation_frame = Entity.components["Animation"].get_next_frame(
             Entity, position)
 
         rect = animation_frame.get_rect()
-        rect.center = position.center
+        rect.centerx = position.centerx
         rect.bottom = position.bottom
 
         self.screen.blit(animation_frame, rect)

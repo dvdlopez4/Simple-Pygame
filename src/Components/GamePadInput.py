@@ -26,7 +26,6 @@ class GamePadInput(object):
             buttons.append(self.joystick.get_button(button))
         return buttons
 
-
     def update(self, Entity):
         self.Buttons = self.GetButtons()
 

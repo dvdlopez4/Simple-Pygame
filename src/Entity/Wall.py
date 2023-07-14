@@ -1,6 +1,7 @@
-from Entity.entity import *
+from Entity.entity import Entity
+
 
 class Wall(Entity):
     def __init__(self, _input, _physics, _graphics, x, y, w, h):
         super(Wall, self).__init__(_input, _physics, _graphics)
-        self.rect.x, self.rect.y, self.rect.w, self.rect.h = x,y,w,h
+        self.x, self.y, self.w, self.h = x, y, w, h

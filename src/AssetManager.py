@@ -25,7 +25,11 @@ class SoundManager(object):
     sounds = {
         "PLAYER_JUMP_SOUND_1": mixer.Sound(f"{ASSET_FILE_PATH}/sound/Jump2_01.wav"),
         "PLAYER_JUMP_SOUND_2": mixer.Sound(f"{ASSET_FILE_PATH}/sound/Jump_01.wav"),
-        "PLAYER_SWORD_ATTACK_SOUND": mixer.Sound(f"{ASSET_FILE_PATH}/sound/Sword_01.wav")
+        "PLAYER_SWORD_ATTACK_SOUND": mixer.Sound(f"{ASSET_FILE_PATH}/sound/Sword_01.wav"),
+        "ENEMY_SOUND_1": mixer.Sound(f'{ASSET_FILE_PATH}/sound/Enemy1.wav'),
+        "ENEMY_SOUND_2": mixer.Sound(f'{ASSET_FILE_PATH}/sound/Enemy2.wav'),
+        "ENEMY_SOUND_3": mixer.Sound(f'{ASSET_FILE_PATH}/sound/Enemy3.wav'),
+        "ENEMY_SOUND_4": mixer.Sound(f'{ASSET_FILE_PATH}/sound/Enemy4.wav')
     }
 
     @staticmethod

@@ -74,12 +74,12 @@ class RunningState(object):
             return DashState()
 
         if Input.Buttons[Input.Actions["Left"]]:
-            Entity.directionFacing = -1
+            Entity.components["Animation"].directionFacing = -1
 
         if Input.Buttons[Input.Actions["Right"]]:
-            Entity.directionFacing = 1
+            Entity.components["Animation"].directionFacing = 1
 
-        Entity.physics.velocity[0] = (Entity.directionFacing * 150)
+        Entity.physics.velocity[0] = (Entity.components["Animation"].directionFacing * 150)
 
         self.ButtonsReleased = Input.GetButtons()
         return None
@@ -134,7 +134,7 @@ class DashState(object):
 
         Entity.centery += 25
         Entity.h = 5
-        self.velocity = [(Entity.directionFacing * 450), 0]
+        self.velocity = [(Entity.components["Animation"].directionFacing * 450), 0]
 
 
 class JumpState(object):
@@ -147,11 +147,11 @@ class JumpState(object):
             return AttackState()
 
         if Input.Buttons[Input.Actions["Left"]]:
-            Entity.directionFacing = -1
+            Entity.components["Animation"].directionFacing = -1
             Entity.physics.velocity[0] = -150
 
         if Input.Buttons[Input.Actions["Right"]]:
-            Entity.directionFacing = 1
+            Entity.components["Animation"].directionFacing = 1
             Entity.physics.velocity[0] = 150
 
         if is_on_the_ground(Entity):

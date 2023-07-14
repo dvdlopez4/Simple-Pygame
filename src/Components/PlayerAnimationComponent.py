@@ -12,11 +12,13 @@ class PlayerAnimationComponent(object):
         self.Animation = self.AnimationStates["idle"]
         self.count = 0
 
+        self.directionFacing = 1
+
     def get_next_frame(self, Entity, position: Rect):
         if self.frameIndex > len(self.Animation) - 1:
             self.frameIndex = 0
 
-        animation_frame = self.Animation[self.frameIndex] if Entity.directionFacing > 0 else transform.flip(
+        animation_frame = self.Animation[self.frameIndex] if self.directionFacing > 0 else transform.flip(
             self.Animation[self.frameIndex], True, False)
 
         if self.count <= 0:

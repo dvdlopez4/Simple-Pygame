@@ -18,10 +18,19 @@ class AssetManager(object):
         self.assets["PLAYER_ADVENTURER_SPRITE"] = image.load(
             f"{ASSET_FILE_PATH}/sprites/adventurer-Sheet.png").convert_alpha()
 
-        # Sound files
-        self.assets["PLAYER_JUMP_SOUNDS"] = [
-            mixer.Sound(f"{ASSET_FILE_PATH}/sound/Jump2_01.wav"),
-            mixer.Sound(f"{ASSET_FILE_PATH}/sound/Jump_01.wav")
-        ]
-        self.assets["PLAYER_SWORD_ATTACK_SOUND"] = mixer.Sound(
-            f"{ASSET_FILE_PATH}/sound/Sword_01.wav")
+
+class SoundManager(object):
+    mixer.pre_init(44100, -16, 1, 64)
+    mixer.init()
+    sounds = {
+        "PLAYER_JUMP_SOUND_1": mixer.Sound(f"{ASSET_FILE_PATH}/sound/Jump2_01.wav"),
+        "PLAYER_JUMP_SOUND_2": mixer.Sound(f"{ASSET_FILE_PATH}/sound/Jump_01.wav"),
+        "PLAYER_SWORD_ATTACK_SOUND": mixer.Sound(f"{ASSET_FILE_PATH}/sound/Sword_01.wav")
+    }
+
+    @staticmethod
+    def play_sound(sound_key: str):
+        if sound_key not in SoundManager.sounds:
+            return
+
+        SoundManager.sounds[sound_key].play()

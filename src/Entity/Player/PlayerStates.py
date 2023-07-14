@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from AssetManager import SoundManager
 
 
 def is_on_the_ground(Entity):
@@ -79,7 +80,8 @@ class RunningState(object):
         if Input.Buttons[Input.Actions["Right"]]:
             Entity.components["Animation"].directionFacing = 1
 
-        Entity.physics.velocity[0] = (Entity.components["Animation"].directionFacing * 150)
+        Entity.physics.velocity[0] = (
+            Entity.components["Animation"].directionFacing * 150)
 
         self.ButtonsReleased = Input.GetButtons()
         return None
@@ -134,7 +136,8 @@ class DashState(object):
 
         Entity.centery += 25
         Entity.h = 5
-        self.velocity = [(Entity.components["Animation"].directionFacing * 450), 0]
+        self.velocity = [
+            (Entity.components["Animation"].directionFacing * 450), 0]
 
 
 class JumpState(object):
@@ -162,7 +165,7 @@ class JumpState(object):
 
         if self.jumps > 0 and Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]]:
             set_ground_status(Entity, True)
-            Entity.jumpSound[random.randint(0, 1)].play()
+            SoundManager.play_sound("PLAYER_JUMP_SOUND_1")
             if "Animation" in Entity.components:
                 Entity.components["Animation"].set_animation_state("jumping")
 
@@ -174,7 +177,7 @@ class JumpState(object):
 
     def update(self, Entity):
         if is_on_the_ground(Entity):
-            Entity.jumpSound[random.randint(0, 1)].play()
+            SoundManager.play_sound("PLAYER_JUMP_SOUND_1")
             Entity.physics.velocity[1] = -450
 
         if Entity.physics.velocity[1] > 0:
@@ -202,16 +205,14 @@ class AttackState(object):
         return None
 
     def update(self, Entity):
-        Entity.invincibility = 1
         Entity.physics.velocity[1] = 0
 
     def exit(self, Entity, Input):
-        Entity.canHurt = False
-        Entity.invincibility = 0
+        pass
 
     def enter(self, Entity, Input):
         if "Animation" in Entity.components:
             Entity.components["Animation"].set_animation_state("attacking")
             Entity.components["Animation"].frameIndex = 0
 
-        Entity.slashSound.play()
+        SoundManager.play_sound("PLAYER_SWORD_ATTACK_SOUND")

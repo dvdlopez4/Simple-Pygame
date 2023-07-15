@@ -1,4 +1,3 @@
-
 from Entity.entity import Entity
 from . import PlayerStateManager
 
@@ -19,10 +18,6 @@ class DashState(object):
         if Input.Buttons[play_state_manager.Actions["SPECIAL_2"]]:
             return play_state_manager.get_state("Attack")
 
-        if Input.Buttons[play_state_manager.Actions["JUMP"]]:
-            return play_state_manager.get_state("Jump")
-
-        Entity.physics.velocity[1] = 0
         if self.DashFrames <= 0:
             Entity.canDash = False
             if Entity.physics.isOnGround:
@@ -37,6 +32,7 @@ class DashState(object):
         return None
 
     def update(self, Entity: Entity):
+        Entity.physics.velocity[1] = 0
         Entity.physics.velocity[0] += self.velocity[0]
 
     def exit(self, Entity: Entity):

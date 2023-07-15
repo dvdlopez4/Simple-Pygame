@@ -1,27 +1,31 @@
 import numpy as np
 
 from Entity.entity import Entity
-from . import Utils
+from . import PlayerStateManager
 
 
 class StandingState(object):
     def __init__(self):
-        self.isJumpPressed = False
         self.ButtonsReleased = np.zeros((200,), dtype=int)
 
-    def handleInput(self, Entity: Entity, Input):
+    def handleInput(self, Entity: Entity):
+        if "PlayStateManager" not in Entity.components:
+            return
 
-        if Input.Buttons[Input.Actions["Attack"]] and not self.ButtonsReleased[Input.Actions["Attack"]]:
-            return Utils.get_state("Attack")
+        play_state_manager: PlayerStateManager = Entity.components["PlayStateManager"]
+        Input = Entity.input
 
-        if Input.Buttons[Input.Actions["Right"]] or Input.Buttons[Input.Actions["Left"]]:
-            return Utils.get_state("Running")
+        if Input.Buttons[play_state_manager.Actions["SPECIAL_2"]] and not self.ButtonsReleased[play_state_manager.Actions["SPECIAL_2"]]:
+            return play_state_manager.get_state("Attack")
 
-        if (Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]]) or not Entity.physics.isOnGround:
-            return Utils.get_state("Jump")
+        if Input.Buttons[play_state_manager.Actions["RIGHT"]] or Input.Buttons[play_state_manager.Actions["LEFT"]]:
+            return play_state_manager.get_state("Running")
 
-        if Input.Buttons[Input.Actions["Dash"]] and not self.ButtonsReleased[Input.Actions["Dash"]]:
-            return Utils.get_state("Dash")
+        if (Input.Buttons[play_state_manager.Actions["JUMP"]] and not self.ButtonsReleased[play_state_manager.Actions["JUMP"]]) or not Entity.physics.isOnGround:
+            return play_state_manager.get_state("Jump")
+
+        if Input.Buttons[play_state_manager.Actions["SPECIAL_1"]] and not self.ButtonsReleased[play_state_manager.Actions["SPECIAL_1"]]:
+            return play_state_manager.get_state("Dash")
 
         self.ButtonsReleased = Input.GetButtons()
 
@@ -30,11 +34,12 @@ class StandingState(object):
     def update(self, Entity: Entity):
         pass
 
-    def exit(self, Entity: Entity, Input):
+    def exit(self, Entity: Entity):
         pass
 
-    def enter(self, Entity: Entity, Input):
-        self.ButtonsReleased = Input.GetButtons()
+    def enter(self, Entity: Entity):
+        self.ButtonsReleased = Entity.input.GetButtons()
+
         if "Animation" in Entity.components:
             Entity.components["Animation"].set_animation_state("idle")
 

@@ -2,35 +2,45 @@ import numpy as np
 
 from AssetManager import SoundManager
 from Entity.entity import Entity
-from . import Utils
+from . import PlayerStateManager
 
 
 class JumpState(object):
     def __init__(self):
         self.ButtonsReleased = np.zeros((20,), dtype=int)
+        self.drag_coefficient = 0.67
 
-    def handleInput(self, Entity: Entity, Input):
-        if Input.Buttons[Input.Actions["Attack"]] and not self.ButtonsReleased[Input.Actions["Attack"]]:
-            return Utils.get_state("Attack")
+    def handleInput(self, Entity: Entity):
+        if "PlayStateManager" not in Entity.components:
+            return
+
+        play_state_manager: PlayerStateManager = Entity.components["PlayStateManager"]
+        Input = Entity.input
 
         if Entity.physics.isOnGround:
-            return Utils.get_state("Standing")
+            return play_state_manager.get_state("Standing")
 
-        if Input.Buttons[Input.Actions["Dash"]] and not self.ButtonsReleased[Input.Actions["Dash"]] and Entity.canDash:
-            return Utils.get_state("Dash")
+        if Input.Buttons[play_state_manager.Actions["SPECIAL_1"]] and not self.ButtonsReleased[play_state_manager.Actions["SPECIAL_1"]] and Entity.canDash:
+            return play_state_manager.get_state("Dash")
 
-        if (Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]]) and Entity.jumps > 0:
+        if Input.Buttons[play_state_manager.Actions["SPECIAL_2"]] and not self.ButtonsReleased[play_state_manager.Actions["SPECIAL_2"]]:
+            return play_state_manager.get_state("Attack")
+
+        if (Input.Buttons[play_state_manager.Actions["JUMP"]] and not self.ButtonsReleased[play_state_manager.Actions["JUMP"]]) and Entity.jumps >= 1:
+            SoundManager.play_sound("PLAYER_JUMP_SOUND_1")
             Entity.components["Animation"].set_animation_state("jumping")
-            Entity.physics.velocity[1] = -450
+            Entity.physics.velocity[1] = Entity.jump_force * \
+                self.drag_coefficient
             Entity.jumps -= 1
 
-        if Input.Buttons[Input.Actions["Left"]]:
+        if Input.Buttons[play_state_manager.Actions["LEFT"]]:
             Entity.components["Animation"].directionFacing = -1
-            Entity.physics.velocity[0] = -150
+            Entity.physics.velocity[0] = -1 * \
+                (Entity.speed * self.drag_coefficient)
 
-        if Input.Buttons[Input.Actions["Right"]]:
+        if Input.Buttons[play_state_manager.Actions["RIGHT"]]:
             Entity.components["Animation"].directionFacing = 1
-            Entity.physics.velocity[0] = 150
+            Entity.physics.velocity[0] = Entity.speed * self.drag_coefficient
 
         self.ButtonsReleased = Input.GetButtons()
 
@@ -42,16 +52,17 @@ class JumpState(object):
             if "Animation" in Entity.components:
                 Entity.components["Animation"].set_animation_state("falling")
 
-    def exit(self, Entity: Entity, Input):
+    def exit(self, Entity: Entity):
         pass
 
-    def enter(self, Entity: Entity, Input):
+    def enter(self, Entity: Entity):
         if "Animation" in Entity.components:
             Entity.components["Animation"].set_animation_state("jumping")
 
         if Entity.physics.isOnGround:
             SoundManager.play_sound("PLAYER_JUMP_SOUND_1")
-            Entity.physics.velocity[1] = -450
-            Entity.jumps -= 1
+            Entity.physics.velocity[1] = Entity.jump_force
 
-        self.ButtonsReleased = Input.GetButtons()
+        Entity.jumps -= 1
+
+        self.ButtonsReleased = Entity.input.GetButtons()

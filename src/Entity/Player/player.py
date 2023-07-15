@@ -1,5 +1,6 @@
 from Entity.entity import Entity
 from Components.PlayerAnimationComponent import PlayerAnimationComponent
+from Entity.Player.PlayerStates.PlayerStateManager import PlayerStateManager
 
 
 class Player(Entity):
@@ -13,9 +14,12 @@ class Player(Entity):
         # Ability Component?
         self.canDash = True
         self.jumps = self.maxJumps = 2
+        self.speed = 350
+        self.jump_force = -550
 
         # Health Related Component?
         self.health = self.maxHealth = 3
         self.invincibility = 0
 
         self.components["Animation"] = PlayerAnimationComponent()
+        self.components["PlayStateManager"] = PlayerStateManager()

@@ -26,3 +26,9 @@ class Entity(pygame.Rect):
     def update_components(self, world):
         for component in self.components:
             self.components[component].update(world)
+
+    def update_component(self, component_name: str):
+        if component_name not in self.components:
+            return
+
+        self.components[component_name].update(self)

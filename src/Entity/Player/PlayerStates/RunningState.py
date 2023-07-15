@@ -1,35 +1,40 @@
 import numpy as np
 
 from Entity.entity import Entity
-from . import Utils
+from . import PlayerStateManager
 
 
 class RunningState(object):
     def __init__(self):
         self.ButtonsReleased = np.zeros((200,), dtype=int)
 
-    def handleInput(self, Entity: Entity, Input):
+    def handleInput(self, Entity: Entity):
+        if "PlayStateManager" not in Entity.components:
+            return
 
-        if Input.Buttons[Input.Actions["Attack"]] and not self.ButtonsReleased[Input.Actions["Attack"]]:
-            return Utils.get_state("Attack")
+        play_state_manager: PlayerStateManager = Entity.components["PlayStateManager"]
+        Input = Entity.input
 
-        if (not Input.Buttons[Input.Actions["Left"]] and not Input.Buttons[Input.Actions["Right"]]) and Entity.physics.isOnGround:
-            return Utils.get_state("Standing")
+        if Input.Buttons[play_state_manager.Actions["SPECIAL_2"]] and not self.ButtonsReleased[play_state_manager.Actions["SPECIAL_2"]]:
+            return play_state_manager.get_state("Attack")
 
-        if (Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]]) or not Entity.physics.isOnGround:
-            return Utils.get_state("Jump")
+        if (not Input.Buttons[play_state_manager.Actions["RIGHT"]] and not Input.Buttons[play_state_manager.Actions["LEFT"]]) and Entity.physics.isOnGround:
+            return play_state_manager.get_state("Standing")
 
-        if Input.Buttons[Input.Actions["Dash"]] and not self.ButtonsReleased[Input.Actions["Dash"]]:
-            return Utils.get_state("Dash")
+        if (Input.Buttons[play_state_manager.Actions["JUMP"]] and not self.ButtonsReleased[play_state_manager.Actions["JUMP"]]) or not Entity.physics.isOnGround:
+            return play_state_manager.get_state("Jump")
 
-        if Input.Buttons[Input.Actions["Left"]]:
+        if Input.Buttons[play_state_manager.Actions["SPECIAL_1"]] and not self.ButtonsReleased[play_state_manager.Actions["SPECIAL_1"]]:
+            return play_state_manager.get_state("Dash")
+
+        if Input.Buttons[play_state_manager.Actions["LEFT"]]:
             Entity.components["Animation"].directionFacing = -1
 
-        if Input.Buttons[Input.Actions["Right"]]:
+        if Input.Buttons[play_state_manager.Actions["RIGHT"]]:
             Entity.components["Animation"].directionFacing = 1
 
         Entity.physics.velocity[0] = (
-            Entity.components["Animation"].directionFacing * 150)
+            Entity.components["Animation"].directionFacing * Entity.speed)
 
         self.ButtonsReleased = Input.GetButtons()
         return None
@@ -37,10 +42,11 @@ class RunningState(object):
     def update(self, Entity: Entity):
         pass
 
-    def exit(self, Entity: Entity, Input):
+    def exit(self, Entity: Entity):
         pass
 
-    def enter(self, Entity: Entity, Input):
+    def enter(self, Entity: Entity):
         if "Animation" in Entity.components:
             Entity.components["Animation"].set_animation_state("running")
-        self.ButtonsReleased = Input.GetButtons()
+
+        self.ButtonsReleased = Entity.input.GetButtons()

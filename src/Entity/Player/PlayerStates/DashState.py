@@ -1,42 +1,48 @@
 
 from Entity.entity import Entity
-from . import Utils
+from . import PlayerStateManager
 
 
 class DashState(object):
     def __init__(self):
         self.DashFrames = 15
-        self.velocity = [450, 0]
+        self.velocity = [750, 0]
         self.previous_player_dimensions = None
 
-    def handleInput(self, Entity: Entity, Input):
-        if Input.Buttons[Input.Actions["Attack"]]:
-            return Utils.get_state("Attack")
+    def handleInput(self, Entity: Entity):
+        if "PlayStateManager" not in Entity.components:
+            return
 
-        if Entity.invincibility:
-            self.DashFrames = 0
+        play_state_manager: PlayerStateManager = Entity.components["PlayStateManager"]
+        Input = Entity.input
 
+        if Input.Buttons[play_state_manager.Actions["SPECIAL_2"]]:
+            return play_state_manager.get_state("Attack")
+
+        if Input.Buttons[play_state_manager.Actions["JUMP"]]:
+            return play_state_manager.get_state("Jump")
+
+        Entity.physics.velocity[1] = 0
         if self.DashFrames <= 0:
             Entity.canDash = False
             if Entity.physics.isOnGround:
-                if Input.Buttons[Input.Actions["Right"]] or Input.Buttons[Input.Actions["Left"]]:
-                    return Utils.get_state("Running")
+                if Input.Buttons[play_state_manager.Actions["RIGHT"]] or Input.Buttons[play_state_manager.Actions["LEFT"]]:
+                    return play_state_manager.get_state("Running")
 
-                return Utils.get_state("Standing")
+                return play_state_manager.get_state("Standing")
             else:
-                return Utils.get_state("Jump")
+                return play_state_manager.get_state("Jump")
 
         self.DashFrames -= 1
         return None
 
     def update(self, Entity: Entity):
-        Entity.physics.velocity[0] = self.velocity[0]
-        Entity.physics.velocity[1] = self.velocity[1]
+        Entity.physics.velocity[0] += self.velocity[0]
 
-    def exit(self, Entity: Entity, Input):
+    def exit(self, Entity: Entity):
         Entity.w, Entity.h = self.previous_player_dimensions
 
-    def enter(self, Entity: Entity, Input):
+    def enter(self, Entity: Entity):
         if "Animation" in Entity.components:
             Entity.components["Animation"].set_animation_state("dashing")
 

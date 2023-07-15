@@ -2,7 +2,7 @@ import numpy as np
 
 from AssetManager import SoundManager
 from Entity.entity import Entity
-from .Utils import get_state
+from . import Utils
 
 
 class AttackState(object):
@@ -11,7 +11,7 @@ class AttackState(object):
 
     def handleInput(self, Entity: Entity, Input):
         if Entity.components["Animation"].is_on_last_frame():
-            return get_state("Standing")
+            return Utils.get_state("Standing")
 
         return None
 

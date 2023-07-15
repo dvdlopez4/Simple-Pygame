@@ -1,3 +1,8 @@
+from .StandingState import StandingState
+from .AttackState import AttackState
+from .RunningState import RunningState
+from .JumpState import JumpState
+from .DashState import DashState
 
 
 def get_state(state_name: str):
@@ -14,9 +19,3 @@ def get_state(state_name: str):
         return RunningState()
     if (state_name == "Jump"):
         return JumpState()
-
-from .StandingState import StandingState
-from .AttackState import AttackState
-from .RunningState import RunningState
-from .JumpState import JumpState
-from .DashState import DashState

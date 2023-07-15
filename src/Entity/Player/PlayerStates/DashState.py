@@ -1,6 +1,6 @@
 
 from Entity.entity import Entity
-from .Utils import get_state
+from . import Utils
 
 
 class DashState(object):
@@ -11,7 +11,7 @@ class DashState(object):
 
     def handleInput(self, Entity: Entity, Input):
         if Input.Buttons[Input.Actions["Attack"]]:
-            return get_state("Attack")
+            return Utils.get_state("Attack")
 
         if Entity.invincibility:
             self.DashFrames = 0
@@ -20,11 +20,11 @@ class DashState(object):
             Entity.canDash = False
             if Entity.physics.isOnGround:
                 if Input.Buttons[Input.Actions["Right"]] or Input.Buttons[Input.Actions["Left"]]:
-                    return get_state("Running")
+                    return Utils.get_state("Running")
 
-                return get_state("Standing")
+                return Utils.get_state("Standing")
             else:
-                return get_state("Jump")
+                return Utils.get_state("Jump")
 
         self.DashFrames -= 1
         return None

@@ -2,7 +2,7 @@ import numpy as np
 
 from AssetManager import SoundManager
 from Entity.entity import Entity
-from .Utils import get_state
+from . import Utils
 
 
 class JumpState(object):
@@ -11,13 +11,13 @@ class JumpState(object):
 
     def handleInput(self, Entity: Entity, Input):
         if Input.Buttons[Input.Actions["Attack"]] and not self.ButtonsReleased[Input.Actions["Attack"]]:
-            return get_state("Attack")
+            return Utils.get_state("Attack")
 
         if Entity.physics.isOnGround:
-            return get_state("Standing")
+            return Utils.get_state("Standing")
 
         if Input.Buttons[Input.Actions["Dash"]] and not self.ButtonsReleased[Input.Actions["Dash"]] and Entity.canDash:
-            return get_state("Dash")
+            return Utils.get_state("Dash")
 
         if (Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]]) and Entity.jumps > 0:
             Entity.components["Animation"].set_animation_state("jumping")

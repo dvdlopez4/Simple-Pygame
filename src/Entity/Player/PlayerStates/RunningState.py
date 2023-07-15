@@ -1,7 +1,7 @@
 import numpy as np
 
 from Entity.entity import Entity
-from .Utils import get_state
+from . import Utils
 
 
 class RunningState(object):
@@ -11,16 +11,16 @@ class RunningState(object):
     def handleInput(self, Entity: Entity, Input):
 
         if Input.Buttons[Input.Actions["Attack"]] and not self.ButtonsReleased[Input.Actions["Attack"]]:
-            return get_state("Attack")
+            return Utils.get_state("Attack")
 
         if (not Input.Buttons[Input.Actions["Left"]] and not Input.Buttons[Input.Actions["Right"]]) and Entity.physics.isOnGround:
-            return get_state("Standing")
+            return Utils.get_state("Standing")
 
         if (Input.Buttons[Input.Actions["Jump"]] and not self.ButtonsReleased[Input.Actions["Jump"]]) or not Entity.physics.isOnGround:
-            return get_state("Jump")
+            return Utils.get_state("Jump")
 
         if Input.Buttons[Input.Actions["Dash"]] and not self.ButtonsReleased[Input.Actions["Dash"]]:
-            return get_state("Dash")
+            return Utils.get_state("Dash")
 
         if Input.Buttons[Input.Actions["Left"]]:
             Entity.components["Animation"].directionFacing = -1

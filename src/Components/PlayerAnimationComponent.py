@@ -76,7 +76,11 @@ class PlayerAnimationComponent(object):
         if key not in self.AnimationStates:
             return
 
+        self.frameIndex = 0
         self.Animation = self.AnimationStates[key]
+
+    def get_current_animation_rect(self):
+        return self.Animation[self.frameIndex].get_rect()
 
     def is_on_last_frame(self):
         if len(self.AnimationStates) <= 0:

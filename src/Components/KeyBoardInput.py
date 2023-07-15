@@ -1,11 +1,11 @@
 import pygame
-from Entity.Player.PlayerStates import StandingState
+from Entity.Player.PlayerStates.Utils import get_state
 
 
 class KeyBoardInput(object):
 
     def __init__(self):
-        self.state_ = StandingState()
+        self.state_ = get_state("Standing")
         self.Actions = {
             'Right': pygame.K_d,
             'Left': pygame.K_a,

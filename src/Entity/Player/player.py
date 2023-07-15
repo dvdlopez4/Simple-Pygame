@@ -12,7 +12,7 @@ class Player(Entity):
 
         # Ability Component?
         self.canDash = True
-        self.canJump = True
+        self.jumps = self.maxJumps = 2
 
         # Health Related Component?
         self.health = self.maxHealth = 3

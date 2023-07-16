@@ -15,7 +15,7 @@ class Player(Entity):
         self.canDash = True
         self.jumps = self.maxJumps = 2
         self.speed = 350
-        self.jump_force = -550
+        self.jump_force = -450
 
         # Health Related Component?
         self.health = self.maxHealth = 3

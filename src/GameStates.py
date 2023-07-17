@@ -1,5 +1,10 @@
 import pygame
 from Util.constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from LevelUtils import load_level
+from Entity.Player.player import Player
+from Components.KeyBoardInput import KeyBoardInput
+from Components.physics import PhysicsComponent
+from Components.graphics import PlayerGraphics
 
 
 class PlayState(object):
@@ -56,9 +61,12 @@ class RestartState(object):
         pass
 
     def update(self, world, key_events):
-        world.loadLevel()
+        load_level(world)
+        world.addEntity(Player(KeyBoardInput(), PhysicsComponent(),
+                        PlayerGraphics(world.screen)))
+
         for player in world.players:
-            player.set_center(world.start)
+            player.center = world.start
             player.is_active = True
 
         world.score = 0

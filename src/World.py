@@ -1,5 +1,6 @@
 import os
 import pygame
+from typing import List
 
 from Util.constants import ASSET_FILE_PATH, SCREEN_WIDTH, SCREEN_HEIGHT
 from Components.physics import PhysicsComponent
@@ -23,7 +24,7 @@ class World(object):
     def __init__(self):
         self.entities = []
         self.platforms = []
-        self.players = []
+        self.players: List[Player] = []
 
         os.environ["SDL_VIDEO_CENTERED"] = "1"
         pygame.init()
@@ -137,9 +138,11 @@ class World(object):
             # At least one player reached the end of the level
             load_level(self)
             self.score += POINTS_PER_LEVEL
+            if "PlayStateManager" in player.components:
+                player.components["PlayStateManager"].set_state(
+                    player, "Standing")
             player.center = self.start
             player.is_active = True
-            self.addEntity(player)
             break
 
     def ui(self):

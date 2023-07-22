@@ -7,6 +7,7 @@ class DashState(object):
         self.DashFrames = 15
         self.velocity = [750, 0]
         self.previous_player_dimensions = None
+        self.previous_y = None
 
     def handleInput(self, Entity: Entity):
         if "PlayStateManager" not in Entity.components:
@@ -37,6 +38,7 @@ class DashState(object):
 
     def exit(self, Entity: Entity):
         Entity.w, Entity.h = self.previous_player_dimensions
+        Entity.y = self.previous_y
 
     def enter(self, Entity: Entity):
         if "Animation" in Entity.components:
@@ -46,6 +48,7 @@ class DashState(object):
         )
 
         self.previous_player_dimensions = (Entity.w, Entity.h)
+        self.previous_y = Entity.y
         Entity.h = current_animation_rect.h
         Entity.w = current_animation_rect.w // 3
         Entity.y += current_animation_rect.h // 2

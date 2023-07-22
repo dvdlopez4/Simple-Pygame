@@ -18,8 +18,6 @@ SQUARE_DIMENSION = 40
 def load_level(world):
     level = Level((LEVEL_HEIGHT, LEVEL_WIDTH))
 
-    world.entities.clear()
-    world.players.clear()
     world.platforms.clear()
 
     level_as_text = level.generate_as_text(ROOMS)

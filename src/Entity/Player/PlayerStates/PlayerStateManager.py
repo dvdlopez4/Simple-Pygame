@@ -35,6 +35,14 @@ class PlayerStateManager(object):
         if (state_name == "Jump"):
             return JumpState()
 
+    def set_state(self, Entity: Entity, state_name: str):
+        new_state = self.get_state(state_name)
+        if new_state is None:
+            return
+
+        self.state.exit(Entity)
+        self.state = new_state
+
     def update(self, Entity: Entity):
         if Entity.input is None:
             return

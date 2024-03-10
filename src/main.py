@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 
-from World import World
+from EventQueueManager import EventQueueManager
+from EventQueueManager import EventProducer
+from EventQueueManager import HealthEventObserver
 
 
 def main():
-    world = World()
-    world.run()
 
+    EventQueueManager.add_subscriber(HealthEventObserver())
+    ep = EventProducer()
+
+    print(EventQueueManager.subscribers)
+    ep.produce_event()
     return 0
 
 
